@@ -14,7 +14,7 @@ namespace eShopSolution.Data.Configurations
         public void Configure(EntityTypeBuilder<ProductInCategory> builder)
         {
             builder.ToTable("ProductInCategories");
-            builder.HasKey(x => new {x.ProductId, x.Category});
+            builder.HasKey(x => new {x.ProductId, x.CategoryId});
 
             builder.HasOne(x => x.Category).
                 WithMany(x => x.ProductInCategories)

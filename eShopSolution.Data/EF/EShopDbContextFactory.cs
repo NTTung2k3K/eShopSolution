@@ -8,7 +8,7 @@ using System.Text;
 
 namespace eShopSolution.Data.EF
 {
-    public class EShopDbContextFactory : IDesignTimeDbContextFactory<EShopDBContext>
+  /*  public class EShopDbContextFactory : IDesignTimeDbContextFactory<EShopDBContext>
     {
         public EShopDBContext CreateDbContext(string[] args)
         {
@@ -26,5 +26,5 @@ namespace eShopSolution.Data.EF
         }
 
 
-    }
+    }*/
 }

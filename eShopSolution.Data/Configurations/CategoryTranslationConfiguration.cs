@@ -26,9 +26,9 @@ namespace eShopSolution.Data.Configurations
 
             builder.Property(x => x.SeoTitle).HasMaxLength(200);
             builder.HasKey(c => c.Id);
-            builder.HasOne(x => x.Category).WithMany(x => x.CategoryTranslations).HasForeignKey(x => x.Id);
+            builder.HasOne(x => x.Category).WithMany(x => x.CategoryTranslations).HasForeignKey(x => x.CategoryId);
             builder.HasOne(x => x.Language).
-                WithMany(x => x.CategoryTranslations).HasForeignKey(x => x.Id);
+                WithMany(x => x.CategoryTranslations).HasForeignKey(x => x.LanguageId);
         }
     }
 }

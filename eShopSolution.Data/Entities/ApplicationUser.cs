@@ -11,5 +11,8 @@ namespace eShopSolution.Data.Entities
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
+        public List<Cart> Carts { get; set; }
+        public List<Order> Orders { get; set; }
+        public List<Transaction> Transactions { get; set; }
     }
 }
