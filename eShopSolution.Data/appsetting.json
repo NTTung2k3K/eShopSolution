@@ -1,0 +1,5 @@
+﻿{
+  "ConnectionStrings": {
+    "eShopSolutionDb": "Data Source=LAPTOP-AEVH89JM\\TUNGK;User ID=sa;Password=12345;Trust Server Certificate=True"
+  }
+}
