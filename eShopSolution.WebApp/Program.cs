@@ -1,7 +1,15 @@
+using eShopSolution.Data.EF;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<EShopDBContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("eShopSolutionDb"));
+});
 
 var app = builder.Build();
 
