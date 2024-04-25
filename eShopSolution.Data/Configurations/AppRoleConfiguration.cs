@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace eShopSolution.Data.Configurations
 {
-    public class LanguageConfiguration : IEntityTypeConfiguration<Language>
+    public class AppRoleConfiguration : IEntityTypeConfiguration<AppRole>
     {
-        public void Configure(EntityTypeBuilder<Language> builder)
+        public void Configure(EntityTypeBuilder<AppRole> builder)
         {
-            builder.ToTable("Languages");
-            builder.HasKey(x => x.Id);
-            builder.Property(x => x.Name).IsRequired().HasMaxLength(50);
+            builder.ToTable("AppRoles");
+
+            builder.Property(x => x.Description).HasMaxLength(200).IsRequired();
         }
     }
 }

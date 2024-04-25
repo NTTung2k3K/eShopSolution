@@ -11,7 +11,7 @@ namespace eShopSolution.Data.Entities
     {
         public int Id { set; get; }
         public DateTime OrderDate { set; get; }
-        public string UserId { set; get; }
+        public Guid UserId { set; get; }
         public string ShipName { set; get; }
         public string ShipAddress { set; get; }
         public string ShipEmail { set; get; }
@@ -19,6 +19,6 @@ namespace eShopSolution.Data.Entities
         public OrderStatus Status { set; get; }
 
         public List<OrderDetail> OrderDetails { get; set; }
-        public ApplicationUser User { set; get; }
+        public AppUser User { set; get; }
     }
 }

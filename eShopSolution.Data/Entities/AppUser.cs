@@ -7,12 +7,18 @@ using System.Threading.Tasks;
 
 namespace eShopSolution.Data.Entities
 {
-    public class ApplicationUser : IdentityUser
+    public class AppUser : IdentityUser<Guid>
     {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public DateTime Dob { get; set; }
+
         public List<Cart> Carts { get; set; }
+
         public List<Order> Orders { get; set; }
+
         public List<Transaction> Transactions { get; set; }
     }
 }
