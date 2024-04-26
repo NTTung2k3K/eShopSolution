@@ -1,9 +1,9 @@
-﻿using eShopSolution.Application.Catalog.Products.Dtos;
-using eShopSolution.Application.Catalog.Products.Dtos.Manage;
-using eShopSolution.Application.Dtos;
+﻿
 using eShopSolution.Data.EF;
 using eShopSolution.Data.Entities;
 using eShopSolution.Utilities;
+using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Catalog.Product;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
 using System;
@@ -50,7 +50,7 @@ namespace eShopSolution.Application.Catalog.Products
             return await _context.SaveChangesAsync();
         }
 
-        public  async Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingRequest request)
+        public  async Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingManageRequest request)
         {
             var allProduct = from p in _context.Products
                              join pt in _context.ProductTranslations on p.Id equals pt.ProductId

@@ -1,7 +1,7 @@
-﻿using eShopSolution.Application.Catalog.Products.Dtos;
-using eShopSolution.Application.Catalog.Products.Dtos.Public;
-using eShopSolution.Application.Dtos;
+﻿
 using eShopSolution.Data.EF;
+using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Catalog.Product;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
 using System;
@@ -21,7 +21,7 @@ namespace eShopSolution.Application.Catalog.Products
         public PublicProductService(EShopDBContext context) {
             _context = context;
         }
-        public async Task<PageResult<ProductViewModel>> GetAllByCategoryId(ProductPagingRequest request)
+        public async Task<PageResult<ProductViewModel>> GetAllByCategoryId(ProductPagingPublicRequest request)
         {
             var allProduct = from c in _context.Categories
                              join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
