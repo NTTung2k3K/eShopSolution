@@ -12,5 +12,7 @@
 - Microsoft.Extensions.Configuration.Json 6.0
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore 6.0
 - PagedList.Mvc 4.5
+- Microsoft.AspNetCore.Hosting 2.1.1
+- Microsoft.AspNetCore.Http.Features 5.0.17
 ## How to run 
 ## How to contribute
