@@ -11,5 +11,6 @@
 - Microsoft.Extensions.Configuration.FileExtensions 6.0
 - Microsoft.Extensions.Configuration.Json 6.0
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore 6.0
+- PagedList.Mvc 4.5
 ## How to run 
 ## How to contribute

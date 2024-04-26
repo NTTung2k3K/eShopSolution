@@ -21,6 +21,8 @@ namespace eShopSolution.Data.Configurations
             builder.Property(x => x.Stock).IsRequired().HasDefaultValue(0);
             builder.Property(x => x.ViewCount).IsRequired().HasDefaultValue(0);
             builder.Property(x => x.DateCreated).IsRequired().HasDefaultValue(DateTime.Now);
+            builder.Property(x => x.DateModify).IsRequired().HasDefaultValue(DateTime.Now);
+
 
 
         }

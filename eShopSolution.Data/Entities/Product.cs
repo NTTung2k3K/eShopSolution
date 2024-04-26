@@ -14,6 +14,7 @@ namespace eShopSolution.Data.Entities
         public int Stock { set; get; }
         public int ViewCount { set; get; }
         public DateTime DateCreated { set; get; }
+        public DateTime DateModify { set; get; }
 
         public List<OrderDetail> OrderDetails { get; set; }
 
@@ -22,5 +23,8 @@ namespace eShopSolution.Data.Entities
         public List<ProductTranslation> ProductTranslations { get; set; }
 
         public List<ProductInCategory> ProductInCategories { get; set; }
+
+        public List<ProductImage> ProductImages { get; set; }
+
     }
 }
