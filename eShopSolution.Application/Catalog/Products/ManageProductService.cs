@@ -41,6 +41,7 @@ namespace eShopSolution.Application.Catalog.Products
                 Stock = request.Stock,
                 ViewCount = request.ViewCount,
                 DateCreated = DateTime.Now,
+                DateModify = DateTime.Now,
                 ProductTranslations = new List<ProductTranslation>
                 {
                     new ProductTranslation()
@@ -52,6 +53,7 @@ namespace eShopSolution.Application.Catalog.Products
                         SeoDescription = request.SeoDescription,
                         SeoTitle = request.SeoTitle,
                         LanguageId = request.LanguageId,
+                        
 
                     }
                 }
@@ -145,7 +147,7 @@ namespace eShopSolution.Application.Catalog.Products
         public async Task<int> Update(ProductUpdateRequest request)
         {
             var product = await _context.Products.FindAsync(request.Id);
-            var productTranslate = await _context.ProductTranslations.FindAsync(request.Id);
+            var productTranslate = _context.ProductTranslations.FirstOrDefault(x => x.ProductId == request.Id);
             if (product == null || productTranslate == null) throw new eShopException("Not exist ProductId " + request.Id);
             productTranslate.Name = request.Name;
             productTranslate.Description = request.Description;
@@ -153,7 +155,6 @@ namespace eShopSolution.Application.Catalog.Products
             productTranslate.SeoTitle = request.SeoTitle;
             productTranslate.SeoDescription = request.SeoDescription;
             productTranslate.SeoAlias = request.SeoAlias;
-            productTranslate.LanguageId = request.LanguageId;
             var currentThumbnalImage = await _context.ProductImages.FirstOrDefaultAsync(x => x.IsDefault == true && x.ProductId == request.Id);
 
             if (request.ThumbnalImage != null)
@@ -247,6 +248,33 @@ namespace eShopSolution.Application.Catalog.Products
                 });
             }
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<ProductViewModel> GetProductById(int productId)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null) throw new eShopException("Not found productId " + productId);
+            var productTranslate = _context.ProductTranslations.FirstOrDefault(x => x.ProductId == productId);
+            if (productTranslate == null) throw new eShopException("Not found productId in ProductTranslate " + productId);
+
+            var productViewModel = new ProductViewModel()
+            {
+                Id = product.Id,
+                Price = product.Price,
+                OriginalPrice = product.OriginalPrice,
+                Stock = product.Stock,
+                ViewCount = product.ViewCount,
+                DateCreated = product.DateCreated,
+                DateModified = product.DateModify,
+                Name = productTranslate.Name,
+                Description = productTranslate.Description,
+                Details = productTranslate.Details,
+                SeoDescription = productTranslate.SeoDescription,
+                SeoAlias = productTranslate.SeoAlias,
+                SeoTitle = productTranslate.SeoTitle,
+                LanguageId = productTranslate.LanguageId
+            };
+            return productViewModel;
         }
     }
 }

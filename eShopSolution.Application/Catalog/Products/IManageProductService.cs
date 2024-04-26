@@ -26,6 +26,8 @@ namespace eShopSolution.Application.Catalog.Products
         Task<int> RemoveImage(int imageId);
         Task<int> AddImages(int productId,List<IFormFile> listImage);
 
+        Task<ProductViewModel> GetProductById(int productId);
+
         Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingManageRequest request);
     }
 }

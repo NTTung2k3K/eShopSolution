@@ -14,7 +14,8 @@ namespace eShopSolution.Application.Common
 
         public FileStorageService(IWebHostEnvironment webHostEnvironment)
         {
-            _userContentFolder = Path.Combine(webHostEnvironment.WebRootPath, USER_CONTENT_FOLDER_NAME);
+            string rootPath = webHostEnvironment.WebRootPath ?? webHostEnvironment.ContentRootPath;
+            _userContentFolder = Path.Combine(rootPath, USER_CONTENT_FOLDER_NAME);
         }
 
         public string GetFileUrl(string fileName)
@@ -25,9 +26,19 @@ namespace eShopSolution.Application.Common
         public async Task SaveFileAsync(Stream mediaBinaryStream, string fileName)
         {
             var filePath = Path.Combine(_userContentFolder, fileName);
+
+            // Check if the directory exists
+            var directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                // If the directory doesn't exist, create it
+                Directory.CreateDirectory(directory);
+            }
+
             using var output = new FileStream(filePath, FileMode.Create);
             await mediaBinaryStream.CopyToAsync(output);
         }
+
 
         public async Task DeleteFileAsync(string fileName)
         {
