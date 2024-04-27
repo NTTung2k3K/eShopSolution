@@ -1,6 +1,7 @@
-﻿using eShopSolution.Application.Catalog.Products.Dtos;
-using eShopSolution.Application.Catalog.Products.Dtos.Manage;
-using eShopSolution.Application.Dtos;
+﻿
+using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Catalog.Product;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,15 @@ namespace eShopSolution.Application.Catalog.Products
         Task<int> UpdatePrice(int productId,decimal newPrice, decimal newOriginalPrice);
 
         Task<int> UpdateViewCount(int productId,int newViewCount);
+        Task<int> Delete(int productId);
 
-        Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingRequest request);
+        Task<int> UpdateImage(int imageId,string caption,bool IsDefault);
+
+        Task<int> RemoveImage(int imageId);
+        Task<int> AddImages(int productId,List<IFormFile> listImage);
+
+        Task<ProductViewModel> GetProductById(int productId);
+
+        Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingManageRequest request);
     }
 }
