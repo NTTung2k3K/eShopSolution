@@ -54,6 +54,9 @@ namespace eShopSolution.Data.EF
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<Product> Products { get; set; }
+        public DbSet<AppUser> AppUsers  { get; set; }
+        public DbSet<AppRole> Roles { get; set; }
+
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<AppConfig> AppConfigs { get; set; }
