@@ -10,13 +10,13 @@ namespace eShopSolution.BackendApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductsController : ControllerBase
     {
         private readonly EShopDBContext _context;
         private readonly IManageProductService _manageProductService;
         private readonly IPublicProductService _publicProductService;
 
-        public ProductController(EShopDBContext context,IManageProductService manageProductService, IPublicProductService publicProductService) 
+        public ProductsController(EShopDBContext context,IManageProductService manageProductService, IPublicProductService publicProductService) 
         {
             _context = context;
             _manageProductService = manageProductService;

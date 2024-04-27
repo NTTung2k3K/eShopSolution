@@ -246,6 +246,16 @@ namespace eShopSolution.Application.Catalog.Products
                     ImagePath = await this.SaveFile(item),
                     SortOrder = 1
                 });
+
+                _context.ProductImages.Add(new ProductImage()
+                {
+                    Caption = "Added",
+                    DateCreated = DateTime.Now,
+                    FileSize = item.Length,
+                    IsDefault = true,
+                    ImagePath = await this.SaveFile(item),
+                    SortOrder = 1
+                });
             }
             return await _context.SaveChangesAsync();
         }
