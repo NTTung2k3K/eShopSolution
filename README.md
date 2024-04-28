@@ -14,5 +14,6 @@
 - PagedList.Mvc 4.5
 - Microsoft.AspNetCore.Hosting 2.1.1
 - Microsoft.AspNetCore.Http.Features 5.0.17
+- Microsoft.AspNetCore.Authentication 6.0.0
 ## How to run 
 ## How to contribute
