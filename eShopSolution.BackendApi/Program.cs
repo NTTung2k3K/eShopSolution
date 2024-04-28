@@ -3,6 +3,9 @@ using eShopSolution.Application.Common;
 using eShopSolution.Application.System.User;
 using eShopSolution.Data.EF;
 using eShopSolution.Data.Entities;
+using eShopSolution.ViewModel.System.User;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +20,7 @@ builder.Services.AddDbContext<EShopDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("eShopSolutionDb"));
 });
 
-builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -25,7 +28,9 @@ builder.Services.AddTransient<IManageProductService,ManageProductService>();
 builder.Services.AddTransient<IPublicProductService, PublicProductService>();
 builder.Services.AddTransient<IStorageService, FileStorageService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IValidator<LoginUserRequest>,LoginValidationRequest>();
 
+builder.Services.AddControllers().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginValidationRequest>());
 
 builder.Services.AddAuthentication(options =>
 {
