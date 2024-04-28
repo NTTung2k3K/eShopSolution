@@ -1,6 +1,7 @@
 ﻿using eShopSolution.Application.System.User;
 using eShopSolution.Utilities;
 using eShopSolution.ViewModel.System.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace eShopSolution.BackendApi.Controllers
             _userService = userService;
         }
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginUserRequest request)
         {
             try
@@ -31,6 +33,7 @@ namespace eShopSolution.BackendApi.Controllers
         }
 
         [HttpPost("Register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterUserRequest request)
         {
             try
@@ -42,7 +45,7 @@ namespace eShopSolution.BackendApi.Controllers
                 }
                 else
                 {
-                    return Ok("Created !");
+                    return Ok("Created");
                 }
             }
             catch (Exception ex)
