@@ -12,8 +12,8 @@ using eShopSolution.Data.EF;
 namespace eShopSolution.Data.Migrations
 {
     [DbContext(typeof(EShopDBContext))]
-    [Migration("20240427142141_fixbugg")]
-    partial class fixbugg
+    [Migration("20240429121014_fixbugSedd")]
+    partial class fixbugSedd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -91,7 +91,7 @@ namespace eShopSolution.Data.Migrations
                         new
                         {
                             Id = new Guid("8d04dce2-969a-435d-bba4-df3f325983dc"),
-                            ConcurrencyStamp = "84b8f88b-3199-408d-aa22-0eb4779f320d",
+                            ConcurrencyStamp = "0f39db66-578f-447d-bf30-fc1fa6af3ae2",
                             Description = "Administrator role",
                             Name = "admin",
                             NormalizedName = "admin"
@@ -181,7 +181,7 @@ namespace eShopSolution.Data.Migrations
                         {
                             Id = new Guid("69bd714f-9576-45ba-b5b7-f00649be00de"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2b6cea21-188f-457b-b1e8-3e3547370d2e",
+                            ConcurrencyStamp = "88e28a93-d70a-4055-b356-1fa11687d0b3",
                             Dob = new DateTime(2020, 1, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "tedu.international@gmail.com",
                             EmailConfirmed = true,
@@ -190,7 +190,7 @@ namespace eShopSolution.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "tedu.international@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAEAACcQAAAAEIzo68COKcw58UB4zDzPwD+uwteaKZNrCm7xs46s9v0Q2iqWXdchzJ3YTFp3V44q3g==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKqB2y3mR7d4vBI+0UTmsM6Gl4W+pBU3m1gVz7H4VwXcSmIG9ZonzRO+q6xo7q6W0g==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -201,7 +201,10 @@ namespace eShopSolution.Data.Migrations
             modelBuilder.Entity("eShopSolution.Data.Entities.Cart", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -219,6 +222,8 @@ namespace eShopSolution.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("UserId");
 
@@ -521,7 +526,7 @@ namespace eShopSolution.Data.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2024, 4, 27, 21, 21, 40, 884, DateTimeKind.Local).AddTicks(4775),
+                            DateCreated = new DateTime(2024, 4, 29, 19, 10, 14, 194, DateTimeKind.Local).AddTicks(3227),
                             DateModify = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             OriginalPrice = 100000m,
                             Price = 200000m,
@@ -971,7 +976,7 @@ namespace eShopSolution.Data.Migrations
                 {
                     b.HasOne("eShopSolution.Data.Entities.Product", "Product")
                         .WithMany("Carts")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

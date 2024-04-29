@@ -45,7 +45,7 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
-                                    <form class="user" asp-action="Login" method="post">
+                                    <form class="user" asp-action="Login" asp-controller="User" method="post">
                                         <div class="form-group">
                                             <input type="email" class="form-control form-control-user"
                                                    id="exampleInputEmail" aria-describedby="emailHelp"
@@ -65,6 +65,9 @@
                                                     Remember
                                                     Me
                                                 </label>
+                                        </div>
+                                        <div style="color:red">
+                                                @ViewBag.Error
                                         </div>
                                         <input type="submit" value="Login" class="btn btn-primary btn-user btn-block"/>
                                         <hr>

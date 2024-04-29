@@ -1,4 +1,5 @@
-﻿using eShopSolution.ViewModel.System.User;
+﻿using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -12,5 +13,7 @@ namespace eShopSolution.Application.System.User
     {
         public Task<string> Login(LoginUserRequest request);
         public Task<IdentityResult> Register(RegisterUserRequest request);
+
+        public Task<PageResult<UserViewModel>> GetListUser(ViewListUserPagingRequest request);
     }
 }

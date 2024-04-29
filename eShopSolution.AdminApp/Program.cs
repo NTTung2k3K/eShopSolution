@@ -1,11 +1,22 @@
 using eShopSolution.AdminApp.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddHttpClient();
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/User/Login/";
+        options.AccessDeniedPath = "/User/Forbidden/";
+    });
+
 builder.Services.AddTransient<IUserApiService,UserApiService>();
+ 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,6 +32,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

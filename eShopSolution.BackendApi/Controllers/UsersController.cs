@@ -27,7 +27,6 @@ namespace eShopSolution.BackendApi.Controllers
             }
             catch (Exception ex)
             {
-                var e = new eShopException(ex.Message, ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -50,9 +49,23 @@ namespace eShopSolution.BackendApi.Controllers
             }
             catch (Exception ex)
             {
-                var e = new eShopException(ex.Message, ex);
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetUser")]
+        public async Task<IActionResult> GetAllUser([FromQuery] ViewListUserPagingRequest request)
+        {
+            try
+            {
+                var listResult = await _userService.GetListUser(request);
+                    return Ok(listResult);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

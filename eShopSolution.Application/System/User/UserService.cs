@@ -1,10 +1,13 @@
-﻿using eShopSolution.Data.Entities;
+﻿using eShopSolution.Data.EF;
+using eShopSolution.Data.Entities;
+using eShopSolution.ViewModel.Catalog.Common;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,21 +25,70 @@ namespace eShopSolution.Application.System.User
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IConfiguration _configuarion;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly EShopDBContext _dbText;
 
-        public UserService(UserManager<AppUser> userManager,RoleManager<AppRole> roleManager,SignInManager<AppUser> signInManager,
-            IConfiguration configuration) {
+        public UserService(EShopDBContext context ,UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, SignInManager<AppUser> signInManager,
+            IConfiguration configuration)
+        {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuarion = configuration;
             _signInManager = signInManager;
+            _dbText = context;
         }
+
+        public async Task<PageResult<UserViewModel>> GetListUser(ViewListUserPagingRequest request)
+        {
+            var listUser = _dbText.Users.AsQueryable();
+            if(request.Keyword != null) {
+             listUser = listUser.Where(x => x.UserName.Contains(request.Keyword) 
+             || x.Email.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
+            }
+            listUser = listUser.OrderByDescending(x => x.UserName);
+            var listPaging = listUser.ToPagedList(request.pageIndex, request.pageSize).ToList();
+
+
+
+            var listResult = new List<UserViewModel>();
+            foreach (var item in listPaging)
+            {
+                var user = new UserViewModel()
+                {
+                    Username = item.UserName,
+                    PhoneNumber = item.PhoneNumber,
+                    LastName = item.LastName,
+                    FirstName = item.FirstName,
+                    Dob = item.Dob,
+                };
+                var appUser = await _userManager.FindByIdAsync(item.Id.ToString());
+                var roles = await _userManager.GetRolesAsync(appUser);
+                if(roles != null)
+                {
+                    user.Roles = new List<string>();
+                    foreach (var role in roles)
+                    {
+                        user.Roles.Add(role);
+                    }
+                    listResult.Add(user);
+                }
+               
+            }
+
+            var result = new PageResult<UserViewModel>()
+            {
+                Items = listResult,
+                TotalCount = listUser.Count()
+            };
+            return result;
+        }
+
         public async Task<string> Login(LoginUserRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             var userConfirm = await _userManager.CheckPasswordAsync(user, request.Password);
-            if (user == null || userConfirm==false )
+            if (user == null || userConfirm == false)
             {
-                return "Invalid Username or Password";
+                return "";
             }
             var authClaim = new List<Claim>()
             {
@@ -67,7 +119,7 @@ namespace eShopSolution.Application.System.User
                 throw new Exception("Not same password");
             }
             var userFindByEmail = await _userManager.FindByEmailAsync(request.Email);
-            if(userFindByEmail != null)
+            if (userFindByEmail != null)
             {
                 throw new Exception("Email is existed");
 
@@ -82,17 +134,26 @@ namespace eShopSolution.Application.System.User
                 LastName = request.LastName,
                 PhoneNumber = request.PhoneNumber
             };
-            var status = await _userManager.CreateAsync(user,request.Password);
+            var status = await _userManager.CreateAsync(user, request.Password);
             if (status.Succeeded)
             {
-                if(!await _roleManager.RoleExistsAsync(eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER))
+                bool statusRole = await _roleManager.RoleExistsAsync(eShopSolution.ViewModel.Catalog.Users.UserRole.ADMIN);
+                if (!statusRole)
                 {
-                    await _roleManager.CreateAsync(new AppRole()
+                    var role = new AppRole()
                     {
-                        Name = eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER
-                    });
+                        Name = eShopSolution.ViewModel.Catalog.Users.UserRole.ADMIN,
+                        Description = "Administrator role"
+                    };
+                    var result = await _roleManager.CreateAsync(role);
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception("Erro to create role, please contact with manager");
+                    }
+
                 }
-                await _userManager.AddToRoleAsync(user, eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER);
+                await _userManager.AddToRoleAsync(user, eShopSolution.ViewModel.Catalog.Users.UserRole.ADMIN);
+
             }
             return status;
         }
