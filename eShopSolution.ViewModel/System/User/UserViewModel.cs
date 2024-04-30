@@ -8,7 +8,6 @@ namespace eShopSolution.ViewModel.System.User
 {
     public class UserViewModel
     {
-
         public string Username { get; set; }
         public string PhoneNumber { get; set; }
         public string FirstName { get; set; }

@@ -8,10 +8,12 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using eShopSolution.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace eShopSolution.AdminApp.Controllers
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly IUserApiService _userApiService;
         private readonly IConfiguration _configuration;
@@ -21,68 +23,34 @@ namespace eShopSolution.AdminApp.Controllers
             _configuration = configuration;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Login()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return View();
-        }
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginUserRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(ModelState);
-            }
-            var token = await _userApiService.Authenticate(request);
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                var userPrincipal = this.ValidateToken(token);
-                var authProperties = new AuthenticationProperties
-                {
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
-                    IsPersistent = false
-                };
-                await HttpContext.SignInAsync(
-                            CookieAuthenticationDefaults.AuthenticationScheme,
-                            userPrincipal,
-                            authProperties);
-
-                return RedirectToAction("Index", "Home");
-            }
-            ViewBag.Error = "Incorrect Email or password";
-            return View();
-        }
+       
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "User");
+            HttpContext.Session.Remove("token");
+            return RedirectToAction("Index", "Login");
         }
 
 
-
-        private ClaimsPrincipal ValidateToken(string jwtToken)
+        [HttpGet]
+        public async Task<IActionResult> GetAllUser(ViewListUserPagingRequest request)
         {
-            IdentityModelEventSource.ShowPII = true;
-
-            SecurityToken validatedToken;
-            TokenValidationParameters validationParameters = new TokenValidationParameters();
-
-            validationParameters.ValidateLifetime = true;
-
-            validationParameters.ValidAudience = _configuration["Jwt:Audience"];
-            validationParameters.ValidIssuer = _configuration["Jwt:Issuer"];
-            validationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-
-            ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out validatedToken);
-
-            return principal;
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View();
+                }
+                var listUser = await _userApiService.GetAllUser(request);
+                return View(listUser);
+            }
+            catch
+            {
+                return View();
+            }
+           
         }
     }
 }

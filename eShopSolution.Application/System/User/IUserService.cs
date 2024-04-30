@@ -1,4 +1,5 @@
 ﻿using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Common;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -11,9 +12,9 @@ namespace eShopSolution.Application.System.User
 {
     public interface IUserService
     {
-        public Task<string> Login(LoginUserRequest request);
-        public Task<IdentityResult> Register(RegisterUserRequest request);
+        public Task<ApiResult<string>> Login(LoginUserRequest request);
+        public Task<ApiResult<IdentityResult>> Register(RegisterUserRequest request);
 
-        public Task<PageResult<UserViewModel>> GetListUser(ViewListUserPagingRequest request);
+        public Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request);
     }
 }

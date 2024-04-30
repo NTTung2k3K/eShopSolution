@@ -3,6 +3,7 @@ using eShopSolution.ViewModel.System.User;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace eShopSolution.AdminApp.Services
 {
@@ -31,8 +32,9 @@ namespace eShopSolution.AdminApp.Services
           
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["Address:Base"]);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer " + request); // them bearer token vo
-            var response = await client.GetAsync($"/api/User/GetUser?Keyword={request}&pageIndex={request.pageIndex}&pageSize={request.pageSize}");
+
+            /*client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer " + request);*/ // them bearer token vo
+            var response = await client.GetAsync($"/api/Users/GetUser?Keyword={request.Keyword}&pageIndex={request.pageIndex}");
             var body = await response.Content.ReadAsStringAsync();
             var listUser = JsonConvert.DeserializeObject<PageResult<UserViewModel>>(body);
             return listUser;

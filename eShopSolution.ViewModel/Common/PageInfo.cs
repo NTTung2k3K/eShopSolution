@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopSolution.ViewModel.Catalog.Common
+namespace eShopSolution.ViewModel.Common
 {
-    public class PagingRequestBase
+    public static class PageInfo
     {
-        public int? pageIndex { get; set; }
+        public const int PAGE_SIZE = 10;
     }
 }

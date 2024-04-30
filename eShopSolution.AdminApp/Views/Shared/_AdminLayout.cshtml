@@ -109,7 +109,7 @@
                      data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Category Management</h6>
-                        <a class="collapse-item" href="login.html">Users</a>
+                        <a class="collapse-item" asp-action="GetAllUser" asp-controller="User">Users</a>
                         <a class="collapse-item" href="register.html">Register</a>
                         <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
                         <div class="collapse-divider"></div>
@@ -365,7 +365,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    @RenderBody();
+                    @RenderBody()
 
                 </div>
                 <!-- /.container-fluid -->

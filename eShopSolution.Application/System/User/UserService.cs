@@ -1,6 +1,7 @@
 ﻿using eShopSolution.Data.EF;
 using eShopSolution.Data.Entities;
 using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Common;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -37,15 +38,17 @@ namespace eShopSolution.Application.System.User
             _dbText = context;
         }
 
-        public async Task<PageResult<UserViewModel>> GetListUser(ViewListUserPagingRequest request)
+        public async Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request)
         {
             var listUser = _dbText.Users.AsQueryable();
-            if(request.Keyword != null) {
+          /*  if(request.Keyword != null) {
              listUser = listUser.Where(x => x.UserName.Contains(request.Keyword) 
              || x.Email.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
-            }
+            }*/
             listUser = listUser.OrderByDescending(x => x.UserName);
-            var listPaging = listUser.ToPagedList(request.pageIndex, request.pageSize).ToList();
+            int pageIndex = request.pageIndex ?? 1;
+
+            var listPaging = listUser.ToPagedList(pageIndex, ViewModel.Common.PageInfo.PAGE_SIZE ).ToList();
 
 
 
@@ -79,16 +82,18 @@ namespace eShopSolution.Application.System.User
                 Items = listResult,
                 TotalCount = listUser.Count()
             };
-            return result;
+            var apiSuccess = new ApiSuccessResult<PageResult<UserViewModel>>(result);
+            return apiSuccess;
         }
 
-        public async Task<string> Login(LoginUserRequest request)
+        public async Task<ApiResult<string>> Login(LoginUserRequest request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
             var userConfirm = await _userManager.CheckPasswordAsync(user, request.Password);
             if (user == null || userConfirm == false)
             {
-                return "";
+                var errorApi = new ApiErrorResult<string>("Invalid Email or Password");
+                return errorApi;
             }
             var authClaim = new List<Claim>()
             {
@@ -108,20 +113,26 @@ namespace eShopSolution.Application.System.User
                     expires: DateTime.Now.AddMinutes(3),
                     signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature)
                 );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            var ApiSuccess = new ApiSuccessResult<string>(tokenString);
+
+            return ApiSuccess;
 
         }
 
-        public async Task<IdentityResult> Register(RegisterUserRequest request)
+        public async Task<ApiResult<IdentityResult>> Register(RegisterUserRequest request)
         {
             if (!request.Password.Equals(request.ConfirmPassword))
             {
-                throw new Exception("Not same password");
+                var errorApi = new ApiErrorResult<IdentityResult>("Not same password");
+                return errorApi;
             }
             var userFindByEmail = await _userManager.FindByEmailAsync(request.Email);
             if (userFindByEmail != null)
             {
-                throw new Exception("Email is existed");
+                var errorApi = new ApiErrorResult<IdentityResult>("Email is existed");
+                return errorApi;
 
             }
 
@@ -135,6 +146,8 @@ namespace eShopSolution.Application.System.User
                 PhoneNumber = request.PhoneNumber
             };
             var status = await _userManager.CreateAsync(user, request.Password);
+
+
             if (status.Succeeded)
             {
                 bool statusRole = await _roleManager.RoleExistsAsync(eShopSolution.ViewModel.Catalog.Users.UserRole.ADMIN);
@@ -155,7 +168,17 @@ namespace eShopSolution.Application.System.User
                 await _userManager.AddToRoleAsync(user, eShopSolution.ViewModel.Catalog.Users.UserRole.ADMIN);
 
             }
-            return status;
+            if (!status.Succeeded)
+            {
+                var errorApi = new ApiErrorResult<IdentityResult>("Error");
+                foreach (var item in status.Errors)
+                {
+                    errorApi.ValidationErrors.Add(item.Description);
+                }
+                return errorApi;
+            }
+            var ApiSuccess = new ApiSuccessResult<IdentityResult>("Successed");
+            return ApiSuccess;
         }
     }
 }
