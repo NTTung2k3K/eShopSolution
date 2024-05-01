@@ -11,5 +11,8 @@ namespace eShopSolution.AdminApp.Services
 
         Task<ApiResult<PageResult<UserViewModel>>> GetAllUser(ViewListUserPagingRequest request);
         Task<ApiResult<IdentityResult>> Register(RegisterUserRequest request);
+
+        Task<ApiResult<bool>> Edit(EditUserRequest request);
+        Task<ApiResult<UserViewModel>> GetUserById(Guid id);
     }
 }

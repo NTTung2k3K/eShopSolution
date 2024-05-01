@@ -1,4 +1,5 @@
 ﻿using eShopSolution.Application.System.User;
+using eShopSolution.Data.Enums;
 using eShopSolution.Utilities;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authorization;
@@ -63,6 +64,46 @@ namespace eShopSolution.BackendApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("GetUserById")]
+        public async Task<IActionResult> GetUserById(Guid UserId)
+        {
+            try
+            {
+                var status = await _userService.GetUserById(UserId);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpPatch("Edit")]
+        public async Task<IActionResult> Edit(EditUserRequest request)
+        {
+            try
+            {
+                var status = await _userService.Edit(request);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
 
     }
 }

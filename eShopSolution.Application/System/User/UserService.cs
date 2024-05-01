@@ -38,6 +38,45 @@ namespace eShopSolution.Application.System.User
             _dbText = context;
         }
 
+        public async Task<ApiResult<bool>> Edit( EditUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+
+
+            if(user == null)
+            {
+                return new  ApiErrorResult<bool>("Not Found");
+            }
+            user.PhoneNumber= request.PhoneNumber;
+            user.FirstName= request.FirstName;
+            user.LastName= request.LastName;
+            user.Dob= request.Dob;
+            if(request.Roles.Count > 0)
+            {
+                var listRole = await _userManager.GetRolesAsync(user);
+                listRole.Clear();
+                foreach (var role in request.Roles)
+                {
+                    listRole.Add(role);
+                }
+                /*var statusRole = await _roleManager.UpdateAsync();*/
+/*Can check tai sao ko update dc role */
+            }
+            else
+            {
+                var listRole = await _userManager.GetRolesAsync(user);
+                listRole.Clear();
+            }
+            var statusUser = await _userManager.UpdateAsync(user);
+            if(statusUser.Succeeded)
+            {
+                return new ApiSuccessResult<bool>("Success");
+            }
+            return new ApiErrorResult<bool>("Fail");
+
+        }
+
         public async Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request)
         {
             var listUser = _dbText.Users.AsQueryable();
@@ -57,6 +96,7 @@ namespace eShopSolution.Application.System.User
             {
                 var user = new UserViewModel()
                 {
+                    Id = item.Id,
                     Username = item.UserName,
                     PhoneNumber = item.PhoneNumber,
                     LastName = item.LastName,
@@ -84,6 +124,35 @@ namespace eShopSolution.Application.System.User
             };
             var apiSuccess = new ApiSuccessResult<PageResult<UserViewModel>>(result, "Success");
             return apiSuccess;
+        }
+
+        public async Task<ApiResult<UserViewModel>> GetUserById(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<UserViewModel>("Not Found");
+            }
+            var userVm = new UserViewModel()
+            {
+                Id = user.Id,
+                Dob = user.Dob,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Username = user.UserName
+            };
+            var listRoleOfUser = await _userManager.GetRolesAsync(user);
+
+            if (listRoleOfUser.Count > 0)
+            {
+                userVm.Roles = new List<string>();
+                foreach (var role in listRoleOfUser)
+                {
+                    userVm.Roles.Add(role);
+                }
+            }
+            return new ApiSuccessResult<UserViewModel>(userVm, "Success");
         }
 
         public async Task<ApiResult<string>> Login(LoginUserRequest request)
