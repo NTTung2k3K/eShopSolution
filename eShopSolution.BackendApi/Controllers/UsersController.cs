@@ -22,7 +22,7 @@ namespace eShopSolution.BackendApi.Controllers
         {
             try
             {
-                string token = await _userService.Login(request);
+                var token = await _userService.Login(request);
                 return Ok(token);
             }
             catch (Exception ex)
@@ -38,14 +38,11 @@ namespace eShopSolution.BackendApi.Controllers
             try
             {
                 var status = await _userService.Register(request);
-                if (status.Errors.Count() > 0)
+                if (status.IsSuccessed)
                 {
-                    return Ok(status.Errors);
+                    return Ok(status);
                 }
-                else
-                {
-                    return Ok("Created");
-                }
+                return BadRequest(status);
             }
             catch (Exception ex)
             {
@@ -59,7 +56,7 @@ namespace eShopSolution.BackendApi.Controllers
             try
             {
                 var listResult = await _userService.GetListUser(request);
-                    return Ok(listResult);
+                return Ok(listResult);
             }
             catch (Exception ex)
             {

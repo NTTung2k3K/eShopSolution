@@ -38,19 +38,20 @@ namespace eShopSolution.AdminApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(ModelState);
+                ViewBag.Error = "Incorrect Email or password";
+                return View();
             }
-            var token = await _userApiService.Authenticate(request);
+            var apiResult = await _userApiService.Authenticate(request);
 
-            if (!string.IsNullOrEmpty(token))
+            if (apiResult.IsSuccessed)
             {
-                var userPrincipal = this.ValidateToken(token);
+                var userPrincipal = this.ValidateToken(apiResult.ResultObj);
                 var authProperties = new AuthenticationProperties
                 {
                     ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(10),
                     IsPersistent = false
                 };
-                HttpContext.Session.SetString("token", token);
+                HttpContext.Session.SetString("token", apiResult.ResultObj);
                 await HttpContext.SignInAsync(
                             CookieAuthenticationDefaults.AuthenticationScheme,
                             userPrincipal,

@@ -10,6 +10,8 @@ using System.Security.Claims;
 using System.Text;
 using eShopSolution.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using eShopSolution.ViewModel.Common;
+using Microsoft.AspNetCore.Identity;
 
 namespace eShopSolution.AdminApp.Controllers
 {
@@ -18,12 +20,36 @@ namespace eShopSolution.AdminApp.Controllers
         private readonly IUserApiService _userApiService;
         private readonly IConfiguration _configuration;
 
-        public UserController(IUserApiService userApiService,IConfiguration configuration) {
+        public UserController(IUserApiService userApiService, IConfiguration configuration)
+        {
             _userApiService = userApiService;
             _configuration = configuration;
         }
 
-       
+        [HttpGet]
+        public async Task<IActionResult> Register()
+        {
+
+            ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterUserRequest request)
+        {
+            var status = await _userApiService.Register(request);
+            ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+            if (status is ApiErrorResult<IdentityResult> errorResult)
+            {
+                ViewBag.Errors = errorResult.ValidationErrors;
+                return View();
+            }
+
+            return RedirectToAction("GetAllUser", "User");
+        }
+
+
+
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()
@@ -44,13 +70,13 @@ namespace eShopSolution.AdminApp.Controllers
                     return View();
                 }
                 var listUser = await _userApiService.GetAllUser(request);
-                return View(listUser);
+                return View(listUser.ResultObj);
             }
             catch
             {
                 return View();
             }
-           
+
         }
     }
 }

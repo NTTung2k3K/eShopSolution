@@ -12,5 +12,15 @@ namespace eShopSolution.ViewModel.Catalog.Users
         public static string MANAGER = "Manager";
         public static string EMPLOYEE = "Employee";
         public static string CUSTOMER = "Customer";
+
+        public static async Task<List<string>> getListRoleAsync()
+        {
+            var listRole = new List<string>();
+            listRole.Add(ADMIN);
+            listRole.Add(MANAGER);
+            listRole.Add(CUSTOMER);
+            listRole.Add(EMPLOYEE);
+            return listRole;
+        }
     }
 }
