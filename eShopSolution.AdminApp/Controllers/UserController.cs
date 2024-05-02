@@ -124,6 +124,75 @@ namespace eShopSolution.AdminApp.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Detail(ViewDetailUserRequest request)
+        {
+            try
+            {
+
+                if (!ModelState.IsValid)
+                {
+                    return View();
+                }
+                var status = await _userApiService.Detail(request);
+                if (status is ApiErrorResult<UserViewModel> errorResult)
+                {
+                    ViewBag.Error = "Cannot get this userId "+request.UserId;
+                    return View();
+                }
+                return View(status.ResultObj);
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid UserId)
+        {
+            try
+            {
+
+                if (!ModelState.IsValid)
+                {
+                    return View();
+                }
+
+                var User = await _userApiService.GetUserById(UserId);
+                return View(User.ResultObj);
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(DeleteUserRequest request)
+        {
+            try
+            {
+
+                if (!ModelState.IsValid)
+                {
+                    return View();
+                }
+                var status = await _userApiService.Delete(request);
+                if (status is ApiErrorResult<bool> errorResult)
+                {
+                    ViewBag.Errors = errorResult.ValidationErrors;
+                    return View();
+                }
+
+                return RedirectToAction("GetAllUser", "User");
+            }
+            catch
+            {
+                return View();
+            }
+        }
 
     }
 }

@@ -60,7 +60,7 @@ namespace eShopSolution.Application.Catalog.Products
             var pageResult = new PageResult<ProductViewModel>()
             {
                 Items = productResult,
-                TotalCount = productResult.Count
+                TotalRecords = productResult.Count
             };
 
             return pageResult;

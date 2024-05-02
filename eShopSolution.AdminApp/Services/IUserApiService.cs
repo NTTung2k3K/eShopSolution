@@ -14,5 +14,8 @@ namespace eShopSolution.AdminApp.Services
 
         Task<ApiResult<bool>> Edit(EditUserRequest request);
         Task<ApiResult<UserViewModel>> GetUserById(Guid id);
+
+        Task<ApiResult<UserViewModel>> Detail(ViewDetailUserRequest request);
+        Task<ApiResult<bool>> Delete(DeleteUserRequest request);
     }
 }

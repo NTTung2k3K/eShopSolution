@@ -19,6 +19,8 @@ namespace eShopSolution.Application.System.User
         public Task<ApiResult<bool>> Edit(EditUserRequest request);
         public Task<ApiResult<UserViewModel>> GetUserById(Guid id);
 
+        public Task<ApiResult<UserViewModel>> Detail(ViewDetailUserRequest request);
+        public Task<ApiResult<bool>> Delete(DeleteUserRequest request);
 
 
     }

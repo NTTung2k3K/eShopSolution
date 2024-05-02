@@ -35,6 +35,34 @@ namespace eShopSolution.AdminApp.Services
             return JsonConvert.DeserializeObject<ApiErrorResult<string>>(body);
         }
 
+        public async Task<ApiResult<bool>> Delete(DeleteUserRequest request)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["Address:Base"]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("token"));
+            var response = await client.DeleteAsync($"/api/Users/Delete?Id={request.Id}");
+            var body = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(body);
+            }
+            return JsonConvert.DeserializeObject<ApiErrorResult<bool>>(body);
+        }
+
+        public async Task<ApiResult<UserViewModel>> Detail(ViewDetailUserRequest request)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(_configuration["Address:Base"]);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("token"));
+            var response = await client.GetAsync($"/api/Users/Detail?UserId={request.UserId}");
+            var body = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                return JsonConvert.DeserializeObject<ApiSuccessResult<UserViewModel>>(body);
+            }
+            return JsonConvert.DeserializeObject<ApiErrorResult<UserViewModel>>(body);
+        }
+
         public async Task<ApiResult<bool>> Edit(EditUserRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
@@ -103,5 +131,7 @@ namespace eShopSolution.AdminApp.Services
             return JsonConvert.DeserializeObject<ApiErrorResult<IdentityResult>>(body);
 
         }
+
+
     }
 }

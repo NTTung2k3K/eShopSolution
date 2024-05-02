@@ -17,5 +17,6 @@
 - Microsoft.AspNetCore.Authentication 6.0.0
 - FluentValidation.AspNetCore 11.2.2
 - Microsoft.AspNetCore.Session 2.1.1
+- Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation 6.0
 ## How to run 
 ## How to contribute

@@ -52,7 +52,6 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddIdentity<AppUser,AppRole>()
             .AddEntityFrameworkStores<EShopDBContext>();
-            
 
 var app = builder.Build();
 

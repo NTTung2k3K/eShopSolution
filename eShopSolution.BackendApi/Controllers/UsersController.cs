@@ -102,6 +102,41 @@ namespace eShopSolution.BackendApi.Controllers
             }
         }
 
+        [HttpGet("Detail")]
+        public async Task<IActionResult> Detail([FromQuery]ViewDetailUserRequest request)
+        {
+            try
+            {
+                var status = await _userService.Detail(request);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete([FromQuery] DeleteUserRequest request)
+        {
+            try
+            {
+                var status = await _userService.Delete(request);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
 

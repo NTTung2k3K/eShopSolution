@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopSolution.ViewModel.Common
+namespace eShopSolution.ViewModel.System.User
 {
-    public static class PageInfo
+    public class ViewDetailUserRequest
     {
-        public const int PAGE_SIZE = 1;
+        public Guid UserId { get; set; }
     }
 }

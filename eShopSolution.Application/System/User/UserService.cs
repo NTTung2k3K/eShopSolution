@@ -38,6 +38,51 @@ namespace eShopSolution.Application.System.User
             _dbText = context;
         }
 
+        public async Task<ApiResult<bool>> Delete(DeleteUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<bool>("Not Found");
+            }
+            var status = await _userManager.DeleteAsync(user);
+            if (!status.Succeeded)
+            {
+                return new ApiErrorResult<bool>("Fail");
+            }
+            return new ApiSuccessResult<bool>("Success");
+
+        }
+
+        public async Task<ApiResult<UserViewModel>> Detail(ViewDetailUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<UserViewModel>("Not Found");
+            }
+            var userVm = new UserViewModel()
+            {
+                Id = user.Id,
+                Dob = user.Dob,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Username = user.UserName
+            };
+            var listRoleOfUser = await _userManager.GetRolesAsync(user);
+
+            if (listRoleOfUser.Count > 0)
+            {
+                userVm.Roles = new List<string>();
+                foreach (var role in listRoleOfUser)
+                {
+                    userVm.Roles.Add(role);
+                }
+            }
+            return new ApiSuccessResult<UserViewModel>(userVm, "Success");
+        }
+
         public async Task<ApiResult<bool>> Edit( EditUserRequest request)
         {
             var user = await _userManager.FindByIdAsync(request.Id.ToString());
@@ -54,19 +99,39 @@ namespace eShopSolution.Application.System.User
             user.Dob= request.Dob;
             if(request.Roles.Count > 0)
             {
+                
+
                 var listRole = await _userManager.GetRolesAsync(user);
-                listRole.Clear();
-                foreach (var role in request.Roles)
+                foreach (var role in listRole)
                 {
-                    listRole.Add(role);
+                    await _userManager.RemoveFromRoleAsync(user, role);
                 }
-                /*var statusRole = await _roleManager.UpdateAsync();*/
-/*Can check tai sao ko update dc role */
+                foreach (var roleAdd in request.Roles)
+                {
+                    if (!await _roleManager.RoleExistsAsync(roleAdd))
+                    {
+                        var role = new AppRole()
+                        {
+                            Name = roleAdd,
+                            Description = roleAdd
+                        };
+                        var result = await _roleManager.CreateAsync(role);
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception("Error to create role, please contact with manager");
+                        }
+                    }
+                    await _userManager.AddToRoleAsync(user, roleAdd);
+                }
+
             }
             else
             {
                 var listRole = await _userManager.GetRolesAsync(user);
-                listRole.Clear();
+                foreach (var role in listRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role);
+                }
             }
             var statusUser = await _userManager.UpdateAsync(user);
             if(statusUser.Succeeded)
@@ -120,7 +185,9 @@ namespace eShopSolution.Application.System.User
             var result = new PageResult<UserViewModel>()
             {
                 Items = listResult,
-                TotalCount = listUser.Count()
+                TotalRecords = listUser.Count(),
+                PageIndex = pageIndex,
+                PageSize = ViewModel.Common.PageInfo.PAGE_SIZE
             };
             var apiSuccess = new ApiSuccessResult<PageResult<UserViewModel>>(result, "Success");
             return apiSuccess;
