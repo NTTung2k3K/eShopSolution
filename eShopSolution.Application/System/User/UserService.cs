@@ -1,10 +1,14 @@
-﻿using eShopSolution.Data.Entities;
+﻿using eShopSolution.Data.EF;
+using eShopSolution.Data.Entities;
+using eShopSolution.ViewModel.Catalog.Common;
+using eShopSolution.ViewModel.Common;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using PagedList;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,21 +26,217 @@ namespace eShopSolution.Application.System.User
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IConfiguration _configuarion;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly EShopDBContext _dbText;
 
-        public UserService(UserManager<AppUser> userManager,RoleManager<AppRole> roleManager,SignInManager<AppUser> signInManager,
-            IConfiguration configuration) {
+        public UserService(EShopDBContext context, UserManager<AppUser> userManager, RoleManager<AppRole> roleManager, SignInManager<AppUser> signInManager,
+            IConfiguration configuration)
+        {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuarion = configuration;
             _signInManager = signInManager;
+            _dbText = context;
         }
-        public async Task<string> Login(LoginUserRequest request)
+
+        public async Task<ApiResult<bool>> Delete(DeleteUserRequest request)
         {
+            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<bool>("Not Found");
+            }
+            var status = await _userManager.DeleteAsync(user);
+            if (!status.Succeeded)
+            {
+                return new ApiErrorResult<bool>("Fail");
+            }
+            return new ApiSuccessResult<bool>("Success");
+
+        }
+
+        public async Task<ApiResult<UserViewModel>> Detail(ViewDetailUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<UserViewModel>("Not Found");
+            }
+            var userVm = new UserViewModel()
+            {
+                Id = user.Id,
+                Dob = user.Dob,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Username = user.UserName
+            };
+            var listRoleOfUser = await _userManager.GetRolesAsync(user);
+
+            if (listRoleOfUser.Count > 0)
+            {
+                userVm.Roles = new List<string>();
+                foreach (var role in listRoleOfUser)
+                {
+                    userVm.Roles.Add(role);
+                }
+            }
+            return new ApiSuccessResult<UserViewModel>(userVm, "Success");
+        }
+
+        public async Task<ApiResult<bool>> Edit( EditUserRequest request)
+        {
+            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+
+
+
+            if(user == null)
+            {
+                return new  ApiErrorResult<bool>("Not Found");
+            }
+            user.PhoneNumber= request.PhoneNumber;
+            user.FirstName= request.FirstName;
+            user.LastName= request.LastName;
+            user.Dob= request.Dob;
+            if(request.Roles.Count > 0)
+            {
+                
+
+                var listRole = await _userManager.GetRolesAsync(user);
+                foreach (var role in listRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role);
+                }
+                foreach (var roleAdd in request.Roles)
+                {
+                    if (!await _roleManager.RoleExistsAsync(roleAdd))
+                    {
+                        var role = new AppRole()
+                        {
+                            Name = roleAdd,
+                            Description = roleAdd
+                        };
+                        var result = await _roleManager.CreateAsync(role);
+                        if (!result.Succeeded)
+                        {
+                            throw new Exception("Error to create role, please contact with manager");
+                        }
+                    }
+                    await _userManager.AddToRoleAsync(user, roleAdd);
+                }
+
+            }
+            else
+            {
+                var listRole = await _userManager.GetRolesAsync(user);
+                foreach (var role in listRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, role);
+                }
+            }
+            var statusUser = await _userManager.UpdateAsync(user);
+            if(statusUser.Succeeded)
+            {
+                return new ApiSuccessResult<bool>("Success");
+            }
+            return new ApiErrorResult<bool>("Fail");
+
+        }
+
+        public async Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request)
+        {
+            var listUser = _dbText.Users.AsQueryable();
+            /*  if(request.Keyword != null) {
+               listUser = listUser.Where(x => x.UserName.Contains(request.Keyword) 
+               || x.Email.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
+              }*/
+            listUser = listUser.OrderByDescending(x => x.UserName);
+            int pageIndex = request.pageIndex ?? 1;
+
+            var listPaging = listUser.ToPagedList(pageIndex, ViewModel.Common.PageInfo.PAGE_SIZE).ToList();
+
+
+
+            var listResult = new List<UserViewModel>();
+            foreach (var item in listPaging)
+            {
+                var user = new UserViewModel()
+                {
+                    Id = item.Id,
+                    Username = item.UserName,
+                    PhoneNumber = item.PhoneNumber,
+                    LastName = item.LastName,
+                    FirstName = item.FirstName,
+                    Dob = item.Dob,
+                };
+                var appUser = await _userManager.FindByIdAsync(item.Id.ToString());
+                var roles = await _userManager.GetRolesAsync(appUser);
+                if (roles != null)
+                {
+                    user.Roles = new List<string>();
+                    foreach (var role in roles)
+                    {
+                        user.Roles.Add(role);
+                    }
+                    listResult.Add(user);
+                }
+
+            }
+
+            var result = new PageResult<UserViewModel>()
+            {
+                Items = listResult,
+                TotalRecords = listUser.Count(),
+                PageIndex = pageIndex,
+                PageSize = ViewModel.Common.PageInfo.PAGE_SIZE
+            };
+            var apiSuccess = new ApiSuccessResult<PageResult<UserViewModel>>(result, "Success");
+            return apiSuccess;
+        }
+
+        public async Task<ApiResult<UserViewModel>> GetUserById(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return new ApiErrorResult<UserViewModel>("Not Found");
+            }
+            var userVm = new UserViewModel()
+            {
+                Id = user.Id,
+                Dob = user.Dob,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Username = user.UserName
+            };
+            var listRoleOfUser = await _userManager.GetRolesAsync(user);
+
+            if (listRoleOfUser.Count > 0)
+            {
+                userVm.Roles = new List<string>();
+                foreach (var role in listRoleOfUser)
+                {
+                    userVm.Roles.Add(role);
+                }
+            }
+            return new ApiSuccessResult<UserViewModel>(userVm, "Success");
+        }
+
+        public async Task<ApiResult<string>> Login(LoginUserRequest request)
+        {
+            if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+            {
+                var errorApi = new ApiErrorResult<string>("Invalid Email or Password");
+                return errorApi;
+            }
+
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             var userConfirm = await _userManager.CheckPasswordAsync(user, request.Password);
-            if (user == null || userConfirm==false )
+            if (user == null || userConfirm == false)
             {
-                return "Invalid Username or Password";
+                var errorApi = new ApiErrorResult<string>("Invalid Email or Password");
+                return errorApi;
             }
             var authClaim = new List<Claim>()
             {
@@ -56,20 +256,26 @@ namespace eShopSolution.Application.System.User
                     expires: DateTime.Now.AddMinutes(3),
                     signingCredentials: new SigningCredentials(authKey, SecurityAlgorithms.HmacSha512Signature)
                 );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            var ApiSuccess = new ApiSuccessResult<string>(tokenString, "Success");
+
+            return ApiSuccess;
 
         }
 
-        public async Task<IdentityResult> Register(RegisterUserRequest request)
+        public async Task<ApiResult<IdentityResult>> Register(RegisterUserRequest request)
         {
             if (!request.Password.Equals(request.ConfirmPassword))
             {
-                throw new Exception("Not same password");
+                var errorApi = new ApiErrorResult<IdentityResult>("Not same password");
+                return errorApi;
             }
             var userFindByEmail = await _userManager.FindByEmailAsync(request.Email);
-            if(userFindByEmail != null)
+            if (userFindByEmail != null)
             {
-                throw new Exception("Email is existed");
+                var errorApi = new ApiErrorResult<IdentityResult>("Email is existed");
+                return errorApi;
 
             }
 
@@ -82,19 +288,45 @@ namespace eShopSolution.Application.System.User
                 LastName = request.LastName,
                 PhoneNumber = request.PhoneNumber
             };
-            var status = await _userManager.CreateAsync(user,request.Password);
-            if (status.Succeeded)
+
+
+            var status = await _userManager.CreateAsync(user, request.Password);
+            if (!status.Succeeded)
             {
-                if(!await _roleManager.RoleExistsAsync(eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER))
+                var errorApi = new ApiErrorResult<IdentityResult>("Error");
+                errorApi.ValidationErrors = new List<string>();
+                foreach (var item in status.Errors)
                 {
-                    await _roleManager.CreateAsync(new AppRole()
-                    {
-                        Name = eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER
-                    });
+                    errorApi.ValidationErrors.Add(item.Description);
                 }
-                await _userManager.AddToRoleAsync(user, eShopSolution.ViewModel.Catalog.Users.UserRole.CUSTOMER);
+                return errorApi;
             }
-            return status;
+
+
+
+            foreach (var roleString in request.Roles)
+            {
+
+                bool statusRole = await _roleManager.RoleExistsAsync(roleString);
+                if (!statusRole)
+                {
+
+                    var role = new AppRole()
+                    {
+                        Name = roleString,
+                        Description = "Administrator role"
+                    };
+                    var result = await _roleManager.CreateAsync(role);
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception("Error to create role, please contact with manager");
+                    }
+
+                }
+                await _userManager.AddToRoleAsync(user, roleString);
+            }
+            var ApiSuccess = new ApiSuccessResult<IdentityResult>("Successed");
+            return ApiSuccess;
         }
     }
 }

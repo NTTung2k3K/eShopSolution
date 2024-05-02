@@ -35,15 +35,8 @@ namespace eShopSolution.Application.Catalog.Products
 
 
             #region Paging
-            int pageIndex;
-            if (request.pageIndex == null || request.pageIndex == 0)
-            {
-                pageIndex = 1;
-            }
-            else
-            {
-                pageIndex = request.pageIndex;
-            }
+            int pageIndex = request.pageIndex ?? 1;
+
             var productPaged = allProduct.ToPagedList(pageIndex, PAGE_SIZE);
             #endregion
             var productResult = productPaged.Select(x => new ProductViewModel()
@@ -67,7 +60,7 @@ namespace eShopSolution.Application.Catalog.Products
             var pageResult = new PageResult<ProductViewModel>()
             {
                 Items = productResult,
-                TotalCount = productResult.Count
+                TotalRecords = productResult.Count
             };
 
             return pageResult;
