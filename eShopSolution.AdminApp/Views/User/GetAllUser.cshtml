@@ -7,71 +7,154 @@
     ViewData["Title"] = "Manage User";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-
 <h1>Manage Users</h1>
+<form asp-action="GetAllUser" asp-controller="User" method="get">
 
+    <div class="row">
+        <div class="col-md-3  col-sm-12">
+            <input type="text" name="Keyword" class="form-control" value="@ViewBag.txtLastSeachValue" placeholder="Enter Keyword">
+        </div>
+        <button class="btn btn-success">Search</button>
+
+    </div>
+</form>
+
+<br />
 <p>
     <a asp-action="Register" asp-controller="User" class="btn btn-primary">Create</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Username
-            </th>
-            <th>
-                PhoneNumber
-            </th>
-            <th>
-                FirstName
-            </th>
-            <th>
-                LastName
-            </th>
-            <th>
-                Dob
-            </th>
-            <th>
-                Roles
-            </th>
-            <th class="text-center">Setting</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Items)
-        {
+@if (Model.Items.Count > 0)
+{
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Username)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Dob)
-                </td>
-                <td>
-                    @foreach (var role in item.Roles)
-                    {
-                        <label>@role</label>
-                    }
-                </td>
-                <td class="text-center">
-
-                    @Html.ActionLink("Edit", "Edit", new { UserId = item.Id }, new { @class = "btn btn-warning" })
-                    @Html.ActionLink("Detail", "Detail", new { UserId = item.Id }, new { @class = "btn btn-info" }) 
-                    @Html.ActionLink("Delete", "Delete", new { UserId = item.Id }, new {@class="btn btn-danger"})
-                </td>
+                <th>
+                    Username
+                </th>
+                <th>
+                    PhoneNumber
+                </th>
+                <th>
+                    FirstName
+                </th>
+                <th>
+                    LastName
+                </th>
+                <th>
+                    Dob
+                </th>
+                <th>
+                    Roles
+                </th>
+                <th class="text-center">Setting</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Username)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dob)
+                    </td>
+                    <td>
+                        @foreach (var role in item.Roles)
+                        {
+                            <label>@role</label>
+                        }
+                    </td>
+                    <td class="text-center">
+
+                        @Html.ActionLink("Edit", "Edit", new { UserId = item.Id }, new { @class = "btn btn-warning" })
+                        @Html.ActionLink("Detail", "Detail", new { UserId = item.Id }, new { @class = "btn btn-info" })
+                        @Html.ActionLink("Delete", "Delete", new { UserId = item.Id }, new { @class = "btn btn-danger" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h3 class="d-flex justify-content-center align-items-center" style="color:red; font-weight:bold">Not Found</h3>
+}
+
 <div class="d-flex justify-content-center align-items-center">
     @await Component.InvokeAsync("Pager", Model)
 </div>
+
+<!-- #region notification -->
+@if (ViewBag.SuccessMsg != null)
+{
+    <!-- Success notification -->
+    <div style="position: absolute; top: 13%; right: 0; width:19%">
+        <!-- Then put toasts within -->
+        <div id="toast" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: limegreen; border-radius:3px; border: 1px solid green">
+            <div class="toast-header" style="color: green; display:flex; align-items:center; border:none">
+                <i class="fa-solid fa-circle-check" style="height:5px; width:5px; display:flex; align-items:center; margin-right: 14px; color: green"></i>
+                <strong class="mr-auto" style="color: green">Nofication</strong>
+                <small class="text-muted" style="color: green">just now</small>
+                <button id="btnCloseNotification" type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" style="color: green">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body" style="background-color: azure">
+                @ViewBag.SuccessMsg
+            </div>
+        </div>
+    </div>
+    <!-- END Success notification -->
+}
+
+@if (ViewBag.FailMsg != null)
+{
+    <!-- Error notification -->
+
+    <div style="position: absolute; top: 13%; right: 0; width:19%">
+        <!-- Then put toasts within -->
+        <div id="toast" role="alert" aria-live="assertive" aria-atomic="true" style="background-color: indianred; border-radius:3px; border: 1px solid red">
+            <div class="toast-header" style="color: red; display:flex; align-items:center; border:none">
+                <i class="fa-solid fa-circle-check" style="height:5px; width:5px; display:flex; align-items:center; margin-right: 14px; color: red"></i>
+                <strong class="mr-auto" style="color: red">Nofication</strong>
+                <small class="text-muted" style="color: red">just now</small>
+                <button id="btnCloseNotification" type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" style="color: red">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body" style="background-color: azure">
+                @ViewBag.FailMsg
+            </div>
+        </div>
+    </div>
+
+    <!-- END Error notification -->
+}
+<!-- #endregion -->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            setTimeout(function () {
+                $("#toast").fadeOut("slow");
+            }, 3000);
+        });
+
+        $(document).ready(function () {
+            $("#btnCloseNotification").click(function () {
+                let parent = $(this).parent().parent().parent().hide();
+            });
+        });
+
+    </script>
+
+}

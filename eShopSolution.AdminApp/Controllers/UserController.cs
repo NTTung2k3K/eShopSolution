@@ -44,6 +44,7 @@ namespace eShopSolution.AdminApp.Controllers
                 ViewBag.Errors = errorResult.ValidationErrors;
                 return View();
             }
+            TempData["SuccessMsg"] = "Create success for Username " + request.UserName;
 
             return RedirectToAction("GetAllUser", "User");
         }
@@ -64,11 +65,21 @@ namespace eShopSolution.AdminApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUser(ViewListUserPagingRequest request)
         {
+
             try
             {
+                ViewBag.txtLastSeachValue = request.Keyword;
                 if (!ModelState.IsValid)
                 {
                     return View();
+                }
+                if (TempData["FailMsg"] != null)
+                {
+                    ViewBag.FailMsg = TempData["FailMsg"];
+                }
+                if (TempData["SuccessMsg"] != null)
+                {
+                    ViewBag.SuccessMsg = TempData["SuccessMsg"];
                 }
                 var listUser = await _userApiService.GetAllUser(request);
                 return View(listUser.ResultObj);
@@ -115,7 +126,7 @@ namespace eShopSolution.AdminApp.Controllers
                     ViewBag.Errors = errorResult.ValidationErrors;
                     return View();
                 }
-
+                TempData["SuccessMsg"] = "Edit success for Username with phoneNumber " + request;
                 return RedirectToAction("GetAllUser", "User");
             }
             catch
@@ -137,7 +148,7 @@ namespace eShopSolution.AdminApp.Controllers
                 var status = await _userApiService.Detail(request);
                 if (status is ApiErrorResult<UserViewModel> errorResult)
                 {
-                    ViewBag.Error = "Cannot get this userId "+request.UserId;
+                    ViewBag.Error = "Cannot get this userId " + request.UserId.ToString();
                     return View();
                 }
                 return View(status.ResultObj);
@@ -185,7 +196,7 @@ namespace eShopSolution.AdminApp.Controllers
                     ViewBag.Errors = errorResult.ValidationErrors;
                     return View();
                 }
-
+                TempData["SuccessMsg"] = "Delete success UserId " + request.Id;
                 return RedirectToAction("GetAllUser", "User");
             }
             catch
