@@ -145,10 +145,11 @@ namespace eShopSolution.Application.System.User
         public async Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request)
         {
             var listUser = _dbText.Users.AsQueryable();
-            /*  if(request.Keyword != null) {
-               listUser = listUser.Where(x => x.UserName.Contains(request.Keyword) 
-               || x.Email.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
-              }*/
+            if (request.Keyword != null)
+            {
+                listUser = listUser.Where(x => x.UserName.Contains(request.Keyword)
+                || x.Email.Contains(request.Keyword) || x.PhoneNumber.Contains(request.Keyword));
+            }
             listUser = listUser.OrderByDescending(x => x.UserName);
             int pageIndex = request.pageIndex ?? 1;
 
