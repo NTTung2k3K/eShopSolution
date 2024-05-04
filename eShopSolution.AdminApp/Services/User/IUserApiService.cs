@@ -3,7 +3,7 @@ using eShopSolution.ViewModel.Common;
 using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Identity;
 
-namespace eShopSolution.AdminApp.Services
+namespace eShopSolution.AdminApp.Services.User
 {
     public interface IUserApiService
     {

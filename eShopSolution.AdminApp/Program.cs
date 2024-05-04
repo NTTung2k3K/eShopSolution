@@ -1,4 +1,5 @@
-using eShopSolution.AdminApp.Services;
+using eShopSolution.AdminApp.Services.Role;
+using eShopSolution.AdminApp.Services.User;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IUserApiService,UserApiService>();
+builder.Services.AddTransient<IRoleApiService, RoleApiService>();
+
 
 builder.Services.AddDistributedMemoryCache();
 

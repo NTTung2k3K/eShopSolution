@@ -1,5 +1,4 @@
-﻿using eShopSolution.AdminApp.Services;
-using eShopSolution.ViewModel.System.User;
+﻿using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using eShopSolution.ViewModel.Common;
 using Microsoft.AspNetCore.Identity;
 using eShopSolution.Data.Enums;
+using eShopSolution.AdminApp.Services.User;
 
 namespace eShopSolution.AdminApp.Controllers
 {
