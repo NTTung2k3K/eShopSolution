@@ -1,6 +1,7 @@
 ﻿
 using eShopSolution.ViewModel.Catalog.Common;
 using eShopSolution.ViewModel.Catalog.Product;
+using eShopSolution.ViewModel.Common;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -12,22 +13,22 @@ namespace eShopSolution.Application.Catalog.Products
 {
     public interface IManageProductService
     {
-        Task<int> Create(ProductCreateRequest request);
+        Task<ApiResult<bool>> Create(ProductCreateRequest request);
 
-        Task<int> Update(ProductUpdateRequest request);
+        Task<ApiResult<bool>> Update(ProductUpdateRequest request);
 
-        Task<int> UpdatePrice(int productId,decimal newPrice, decimal newOriginalPrice);
+        Task<ApiResult<bool>> UpdatePrice(ProductUpdatePriceRequest request);
 
-        Task<int> UpdateViewCount(int productId,int newViewCount);
-        Task<int> Delete(int productId);
+        Task<ApiResult<bool>> UpdateViewCount(UpdateViewCountProductRequest request);
+        Task<ApiResult<bool>> Delete(DeleteProductRequest request);
 
-        Task<int> UpdateImage(int imageId,string caption,bool IsDefault);
+        Task<ApiResult<bool>> UpdateImage(UpdateImageProductRequest request);
 
-        Task<int> RemoveImage(int imageId);
-        Task<int> AddImages(int productId,List<IFormFile> listImage);
+        Task<ApiResult<bool>> RemoveImage(RemoveImageProductRequest request);
+        Task<ApiResult<bool>> AddImages(AddImagesProductRequest request);
 
-        Task<ProductViewModel> GetProductById(int productId);
+        Task<ApiResult<ProductViewModel>> GetProductById(int productId);
 
-        Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingManageRequest request);
+        Task<ApiResult<PageResult<ProductViewModel>>> GetAllPaging(ProductPagingManageRequest request);
     }
 }

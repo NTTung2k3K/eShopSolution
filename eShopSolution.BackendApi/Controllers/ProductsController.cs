@@ -24,18 +24,19 @@ namespace eShopSolution.BackendApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll(string keyword,int Page)
+        public async Task<IActionResult> GetAll(ProductPagingManageRequest request)
         {
             try
             {
-                return Ok(_manageProductService.GetAllPaging(new ProductPagingManageRequest()
+                var status = await _manageProductService.GetAllPaging(request);
+                if (status.IsSuccessed)
                 {
-                    Keyword = keyword,
-                    pageIndex = Page
-                }));
-            }catch (Exception ex)
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
             {
-                var e = new eShopException(ex.Message,ex);
                 return BadRequest(ex.Message);
             }
         }

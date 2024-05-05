@@ -9,6 +9,6 @@ namespace eShopSolution.ViewModel.Catalog.Product
 {
     public class ProductPagingManageRequest : PagingRequestBase
     {
-        public string Keyword { get; set; }
+        public string? Keyword { get; set; }
     }
 }
