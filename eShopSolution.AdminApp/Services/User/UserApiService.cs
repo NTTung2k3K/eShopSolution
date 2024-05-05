@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
-namespace eShopSolution.AdminApp.Services
+namespace eShopSolution.AdminApp.Services.User
 {
     public class UserApiService : IUserApiService
     {
@@ -15,7 +15,8 @@ namespace eShopSolution.AdminApp.Services
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserApiService(IHttpClientFactory httpClientFactory,IConfiguration configuration, IHttpContextAccessor httpContextAccessor) {
+        public UserApiService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
@@ -23,12 +24,12 @@ namespace eShopSolution.AdminApp.Services
         public async Task<ApiResult<string>> Authenticate(LoginUserRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
-            var httpContent = new StringContent(json,Encoding.UTF8,"application/json");
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["Address:Base"]);
             var response = await client.PostAsync("/api/Users/Login", httpContent);
             var body = await response.Content.ReadAsStringAsync();
-            if(response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 return JsonConvert.DeserializeObject<ApiSuccessResult<string>>(body);
             }
@@ -66,7 +67,7 @@ namespace eShopSolution.AdminApp.Services
         public async Task<ApiResult<bool>> Edit(EditUserRequest request)
         {
             var json = JsonConvert.SerializeObject(request);
-            var httpContent = new StringContent(json, Encoding.UTF8,"application/json");
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["Address:Base"]);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("token"));
@@ -81,7 +82,7 @@ namespace eShopSolution.AdminApp.Services
 
         public async Task<ApiResult<PageResult<UserViewModel>>> GetAllUser(ViewListUserPagingRequest request)
         {
-          
+
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration["Address:Base"]);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _httpContextAccessor.HttpContext.Session.GetString("token"));
@@ -122,7 +123,7 @@ namespace eShopSolution.AdminApp.Services
 
             client.BaseAddress = new Uri(_configuration["Address:Base"]);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("/api/Users/Register",httpContent);
+            var response = await client.PostAsync("/api/Users/Register", httpContent);
             var body = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {

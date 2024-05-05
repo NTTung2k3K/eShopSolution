@@ -16,7 +16,7 @@ namespace eShopSolution.ViewModel.System.User
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime Dob { get; set; }
-        public List<string> Roles { get; set; }
+        public List<Guid> Roles { get; set; }
 
     }
 }

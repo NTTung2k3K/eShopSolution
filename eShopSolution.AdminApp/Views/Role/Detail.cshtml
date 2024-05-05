@@ -1,0 +1,42 @@
+﻿@model eShopSolution.ViewModel.System.Role.RoleViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Detail</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.RoleId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.RoleId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+    </dl>
+</div>
+<div>
+    <form asp-action="Edit" asp-controller="Role" method="get">
+        <input name="RoleId" type="hidden" value="@Model.RoleId" />
+        <button class="btn btn-warning" style="text-decoration: none">
+            Edit
+        </button>
+    </form>
+    <br />
+    <a asp-action="Index" asp-controller="Role">Back to List</a>
+</div>

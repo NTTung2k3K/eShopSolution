@@ -1,5 +1,6 @@
 using eShopSolution.Application.Catalog.Products;
 using eShopSolution.Application.Common;
+using eShopSolution.Application.System.Role;
 using eShopSolution.Application.System.User;
 using eShopSolution.Data.EF;
 using eShopSolution.Data.Entities;
@@ -30,6 +31,8 @@ builder.Services.AddTransient<IPublicProductService, PublicProductService>();
 builder.Services.AddTransient<IStorageService, FileStorageService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IValidator<LoginUserRequest>,LoginValidationRequest>();
+builder.Services.AddTransient<IRoleService, RoleService>();
+
 
 
 builder.Services.AddAuthentication(options =>

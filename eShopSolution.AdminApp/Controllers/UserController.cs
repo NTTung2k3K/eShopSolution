@@ -1,5 +1,4 @@
-﻿using eShopSolution.AdminApp.Services;
-using eShopSolution.ViewModel.System.User;
+﻿using eShopSolution.ViewModel.System.User;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -13,32 +12,43 @@ using Microsoft.AspNetCore.Authorization;
 using eShopSolution.ViewModel.Common;
 using Microsoft.AspNetCore.Identity;
 using eShopSolution.Data.Enums;
+using eShopSolution.AdminApp.Services.User;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using eShopSolution.Data.Entities;
+using eShopSolution.AdminApp.Services.Role;
+using eShopSolution.ViewModel.System.Role;
 
 namespace eShopSolution.AdminApp.Controllers
 {
+
+    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Manager")]
     public class UserController : BaseController
     {
         private readonly IUserApiService _userApiService;
         private readonly IConfiguration _configuration;
+        private readonly IRoleApiService _roleApiService;
 
-        public UserController(IUserApiService userApiService, IConfiguration configuration)
+        public UserController(IUserApiService userApiService, IConfiguration configuration, IRoleApiService roleApiService)
         {
             _userApiService = userApiService;
             _configuration = configuration;
+            _roleApiService = roleApiService;
         }
-
         [HttpGet]
         public async Task<IActionResult> Register()
         {
-
-            ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+            
+            ViewBag.ListRole = _roleApiService.GetRolesForView().Result.ResultObj.ToList();
             return View();
         }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterUserRequest request)
         {
             var status = await _userApiService.Register(request);
-            ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+
+            ViewBag.ListRole = _roleApiService.GetRolesForView().Result.ResultObj.ToList();
+
             if (status is ApiErrorResult<IdentityResult> errorResult)
             {
                 ViewBag.Errors = errorResult.ValidationErrors;
@@ -94,7 +104,7 @@ namespace eShopSolution.AdminApp.Controllers
         {
             try
             {
-                ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+                ViewBag.ListRole = _roleApiService.GetRolesForView().Result.ResultObj.ToList();
 
                 if (!ModelState.IsValid)
                 {
@@ -114,7 +124,8 @@ namespace eShopSolution.AdminApp.Controllers
         {
             try
             {
-                ViewBag.ListRole = await ViewModel.Catalog.Users.UserRole.getListRoleAsync();
+                ViewBag.ListRole = _roleApiService.GetRolesForView().Result.ResultObj.ToList();
+
 
                 if (!ModelState.IsValid)
                 {
@@ -126,7 +137,7 @@ namespace eShopSolution.AdminApp.Controllers
                     ViewBag.Errors = errorResult.ValidationErrors;
                     return View();
                 }
-                TempData["SuccessMsg"] = "Edit success for Username with phoneNumber " + request;
+                TempData["SuccessMsg"] = "Edit success for Username with phoneNumber " + request.PhoneNumber;
                 return RedirectToAction("GetAllUser", "User");
             }
             catch
@@ -205,5 +216,13 @@ namespace eShopSolution.AdminApp.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Forbidden()
+        {
+            return View();
+        }
+
     }
+
+
 }
