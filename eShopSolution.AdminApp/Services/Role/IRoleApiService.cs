@@ -13,6 +13,8 @@ namespace eShopSolution.AdminApp.Services.Role
         public Task<ApiResult<bool>> Delete(DeleteRoleRequest request);
         public Task<ApiResult<bool>> Edit(EditRoleRequest request);
         public Task<ApiResult<RoleViewModel>> GetRoleById(Guid RoleId);
+        public Task<ApiResult<List<RoleViewModel>>> GetRolesForView();
+
 
     }
 }

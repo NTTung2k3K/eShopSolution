@@ -33,6 +33,23 @@ namespace eShopSolution.BackendApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("GetRolesForView")]
+        public async Task<IActionResult> GetRolesForView()
+        {
+            try
+            {
+                var status = await _roleService.GetRolesForView();
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {

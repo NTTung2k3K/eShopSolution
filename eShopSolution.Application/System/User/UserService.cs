@@ -108,22 +108,10 @@ namespace eShopSolution.Application.System.User
                 }
                 foreach (var roleAdd in request.Roles)
                 {
-                    if (!await _roleManager.RoleExistsAsync(roleAdd))
-                    {
-                        var role = new AppRole()
-                        {
-                            Name = roleAdd,
-                            Description = roleAdd
-                        };
-                        var result = await _roleManager.CreateAsync(role);
-                        if (!result.Succeeded)
-                        {
-                            throw new Exception("Error to create role, please contact with manager");
-                        }
-                    }
-                    await _userManager.AddToRoleAsync(user, roleAdd);
+                    var role = await _roleManager.FindByIdAsync(roleAdd.ToString());
+                    if (role == null) return new ApiErrorResult<bool>("Role is not exited!");
+                    await _userManager.AddToRoleAsync(user, role.Name);
                 }
-
             }
             else
             {
@@ -305,26 +293,11 @@ namespace eShopSolution.Application.System.User
 
 
 
-            foreach (var roleString in request.Roles)
+            foreach (var roleId in request.Roles)
             {
-
-                bool statusRole = await _roleManager.RoleExistsAsync(roleString);
-                if (!statusRole)
-                {
-
-                    var role = new AppRole()
-                    {
-                        Name = roleString,
-                        Description = "Administrator role"
-                    };
-                    var result = await _roleManager.CreateAsync(role);
-                    if (!result.Succeeded)
-                    {
-                        throw new Exception("Error to create role, please contact with manager");
-                    }
-
-                }
-                await _userManager.AddToRoleAsync(user, roleString);
+                var role = await _roleManager.FindByIdAsync(roleId.ToString());
+                if (role == null) return new ApiErrorResult<IdentityResult>("Role is not exited!");
+                await _userManager.AddToRoleAsync(user, role.Name);
             }
             var ApiSuccess = new ApiSuccessResult<IdentityResult>("Successed");
             return ApiSuccess;

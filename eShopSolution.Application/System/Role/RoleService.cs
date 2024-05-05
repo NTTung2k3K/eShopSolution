@@ -131,5 +131,18 @@ namespace eShopSolution.Application.System.Role
             };
             return new ApiSuccessResult<PageResult<RoleViewModel>>(listResult, "Success");
         }
+
+        public async Task<ApiResult<List<RoleViewModel>>> GetRolesForView()
+        {
+            var listRole = await _roleManager.Roles.ToListAsync();
+            var listRoleViewModel = listRole.Select(x => new RoleViewModel()
+            {
+                RoleId = x.Id,
+                Name = x.Name,
+                Description = x.Description
+            }).ToList();
+            return new ApiSuccessResult<List<RoleViewModel>>(listRoleViewModel,"Success");
+
+        }
     }
 }

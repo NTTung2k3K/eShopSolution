@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace eShopSolution.AdminApp.Services.Role
 {
@@ -41,6 +42,12 @@ namespace eShopSolution.AdminApp.Services.Role
         public async Task<ApiResult<RoleViewModel>> GetRoleById(Guid RoleId)
         {
             var data = await GetAsync<ApiResult<RoleViewModel>>($"api/Roles/Detail?RoleId={RoleId}");
+            return data;
+        }
+
+        public async Task<ApiResult<List<RoleViewModel>>> GetRolesForView()
+        {
+            var data = await GetAsync<ApiResult<List<RoleViewModel>>> ($"api/Roles/GetRolesForView");
             return data;
         }
     }

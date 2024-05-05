@@ -12,6 +12,7 @@ using eShopSolution.AdminApp.Services.User;
 
 namespace eShopSolution.AdminApp.Controllers
 {
+    [AllowAnonymous]
     public class LoginController : Controller
     {
 

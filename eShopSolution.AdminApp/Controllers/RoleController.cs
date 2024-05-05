@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eShopSolution.AdminApp.Controllers
 {
+
+    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Manager")]
     public class RoleController : Controller
     {
         private readonly IRoleApiService _roleApiService;
