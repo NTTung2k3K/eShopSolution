@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace eShopSolution.AdminApp.Controllers
 {
 
-    [Authorize(Roles = "Admin")]
-    [Authorize(Roles = "Manager")]
     public class RoleController : Controller
     {
         private readonly IRoleApiService _roleApiService;
@@ -91,7 +89,7 @@ namespace eShopSolution.AdminApp.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(EditRoleRequest request)
+        public async Task<IActionResult> Edit([FromBody]EditRoleRequest request)
         {
             try
             {

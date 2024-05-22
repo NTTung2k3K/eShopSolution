@@ -38,7 +38,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
     <PackageReference Include="PagedList.Mvc" Version="4.5.0" />
   </ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="System\Languages\" />
+	</ItemGroup>
 
 </Project>

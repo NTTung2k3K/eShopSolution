@@ -110,7 +110,7 @@ namespace eShopSolution.Application.System.Role
                 listRole = listRole.Where(x => x.Name.Contains(request.Keyword) ||
                 x.Description.Contains(request.Keyword)).ToList();
             }
-            listRole = listRole.OrderByDescending(x => x.Name).ToList();
+            listRole = listRole.OrderBy(x => x.Name).ToList();
 
             int pageIndex = request.pageIndex ?? 1;
 

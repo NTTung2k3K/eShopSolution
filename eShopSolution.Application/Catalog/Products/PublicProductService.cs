@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using eShopSolution.Application.Catalog.Products;
+using Microsoft.AspNetCore.Http;
 
 namespace eShopSolution.Application.Catalog.Products
 {
@@ -24,6 +25,7 @@ namespace eShopSolution.Application.Catalog.Products
             _context = context;
         }
 
+      
         public async Task<ApiResult<PageResult<ProductViewModel>>> GetAllByCategoryId(ProductPagingPublicRequest request)
         {
             var allProduct = from c in _context.Categories

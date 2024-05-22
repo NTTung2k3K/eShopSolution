@@ -13,6 +13,8 @@ namespace eShopSolution.Utilities.Constants
             public const string DefaultLanguageId = "DefaultLanguageId";
             public const string Token = "token";
             public const string BaseAddress = "Address:Base";
+            public const int PAGE_SIZE = 10;
+
         }
     }
 }

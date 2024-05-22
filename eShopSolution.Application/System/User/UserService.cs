@@ -211,7 +211,7 @@ namespace eShopSolution.Application.System.User
             return new ApiSuccessResult<UserViewModel>(userVm, "Success");
         }
 
-        public async Task<ApiResult<string>> Login(LoginUserRequest request)
+        public async Task<ApiResult<string>> Login(LoginUserRequest request) // hàm
         {
             if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
             {
@@ -292,13 +292,13 @@ namespace eShopSolution.Application.System.User
             }
 
 
-
+/*
             foreach (var roleId in request.Roles)
             {
                 var role = await _roleManager.FindByIdAsync(roleId.ToString());
                 if (role == null) return new ApiErrorResult<IdentityResult>("Role is not exited!");
                 await _userManager.AddToRoleAsync(user, role.Name);
-            }
+            }*/
             var ApiSuccess = new ApiSuccessResult<IdentityResult>("Successed");
             return ApiSuccess;
         }

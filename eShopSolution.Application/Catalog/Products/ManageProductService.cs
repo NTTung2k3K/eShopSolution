@@ -84,7 +84,8 @@ namespace eShopSolution.Application.Catalog.Products
         public async Task<ApiResult<PageResult<ProductViewModel>>> GetAllPaging(ProductPagingManageRequest request)
         {
             var allProduct = from p in _context.Products
-                             join pt in _context.ProductTranslations on p.Id equals pt.ProductId
+                             join pt in _context.ProductTranslations on p.Id equals pt.ProductId into JoinedItem
+                             from pt in JoinedItem.DefaultIfEmpty() 
                              select new
                              {
                                  Product = p,

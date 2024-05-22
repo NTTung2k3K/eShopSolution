@@ -32,9 +32,14 @@ builder.Services.AddTransient<IStorageService, FileStorageService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IValidator<LoginUserRequest>,LoginValidationRequest>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddDistributedMemoryCache();
 
-
-
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -55,9 +60,16 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddIdentity<AppUser,AppRole>()
             .AddEntityFrameworkStores<EShopDBContext>();
-
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
+app.UseSession();
+app.UseCors(x => x
+    .AllowAnyHeader()   // Allows any header in the request
+    .AllowAnyMethod()   // Allows any HTTP method (GET, POST, PUT, DELETE, etc.)
+    .WithOrigins("http://localhost:3000"));  // Allows requests from the specified origin
 
+app.UseAuthentication();
+app.UseAuthorization();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -66,8 +78,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+
 
 app.MapControllers();
 
