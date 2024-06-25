@@ -31,12 +31,16 @@ jobs:
       - name: Publish
         run: dotnet publish ./eShopSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
 
+       - name: Compress publish directory
+        run: |
+          cd ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          zip -r ../${{ env.ARTIFACT_NAME }} *
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: dotnet-app
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
+          path: ${{ env.ARTIFACT_NAME }}
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -44,16 +48,20 @@ jobs:
       name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-    steps:
+     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
           name: dotnet-app
+
+      - name: Unzip artifact
+        run: |
+          unzip dotnet-app.zip -d ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} # Replace with your Azure publish profile secret
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Replace with your Azure publish profile secret
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
