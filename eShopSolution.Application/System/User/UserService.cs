@@ -265,7 +265,6 @@ namespace eShopSolution.Application.System.User
             {
                 var errorApi = new ApiErrorResult<IdentityResult>("Email is existed");
                 return errorApi;
-
             }
 
             var user = new AppUser()

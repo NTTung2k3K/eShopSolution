@@ -30,7 +30,7 @@ namespace eShopSolution.AdminApp.Controllers
         {
             var user = User.Identity.Name;
             return View();
-        }
+        }       
 
         public IActionResult Privacy()
         {

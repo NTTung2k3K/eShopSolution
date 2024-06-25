@@ -105,11 +105,11 @@ namespace eShopSolution.AdminApp.Controllers
             var result = new ChallengeResult(provider, properties);
             return result;
         }
-
+            
         [AllowAnonymous]
         public async Task<IActionResult> GoogleLoginResponse()
         {
-            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();  
             if (info == null)
             {
                 return RedirectToAction("LoginPortal");
@@ -132,9 +132,8 @@ namespace eShopSolution.AdminApp.Controllers
                          user = new AppUser()
                         {
                             FirstName = info.Principal.FindFirst(ClaimTypes.GivenName)?.Value,
-                            LastName = info.Principal.FindFirst(ClaimTypes.Surname)?.Value, // Example: Surname claim
+                            LastName = info.Principal.FindFirst(ClaimTypes.Surname)?.Value,
                             Email = info.Principal.FindFirst(ClaimTypes.Email)?.Value,
-                            UserName = username,
                         };
                     }
 

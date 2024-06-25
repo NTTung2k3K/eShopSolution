@@ -159,7 +159,6 @@ namespace eShopSolution.AdminApp.Controllers
                 return View();
             }
         }
-        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
