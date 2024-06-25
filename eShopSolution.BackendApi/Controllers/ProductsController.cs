@@ -1,10 +1,13 @@
 ﻿using eShopSolution.Application.Catalog.Products;
+using eShopSolution.BackendApi.Models;
 using eShopSolution.Data.EF;
+using eShopSolution.Data.Entities;
 using eShopSolution.Utilities;
 using eShopSolution.ViewModel.Catalog.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static eShopSolution.BackendApi.Models.Cart;
 
 namespace eShopSolution.BackendApi.Controllers
 {
@@ -15,88 +18,153 @@ namespace eShopSolution.BackendApi.Controllers
         private readonly EShopDBContext _context;
         private readonly IManageProductService _manageProductService;
         private readonly IPublicProductService _publicProductService;
-
-        public ProductsController(EShopDBContext context,IManageProductService manageProductService, IPublicProductService publicProductService) 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ProductsController(EShopDBContext context,IManageProductService manageProductService,IHttpContextAccessor httpContextAccessor, IPublicProductService publicProductService) 
         {
+            _httpContextAccessor = httpContextAccessor;
             _context = context;
             _manageProductService = manageProductService;
             _publicProductService = publicProductService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll(string keyword,int Page)
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll([FromQuery]ProductPagingManageRequest request)
         {
             try
             {
-                return Ok(_manageProductService.GetAllPaging(new ProductPagingManageRequest()
+                var status = await _manageProductService.GetAllPaging(request);
+                if (status.IsSuccessed)
                 {
-                    Keyword = keyword,
-                    pageIndex = Page
-                }));
-            }catch (Exception ex)
+                    return Ok(status);
+                }
+                return BadRequest(status);
+            }
+            catch (Exception ex)
             {
-                var e = new eShopException(ex.Message,ex);
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPost]
+        [HttpPost("Create")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create([FromForm] ProductCreateRequest request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var status = await _manageProductService.Create(request);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
             }
-            var productId = await _manageProductService.Create(request);
-            if (productId == 0)
-                return BadRequest();
-
-            var product = await _manageProductService.GetProductById(productId);
-
-            return Ok(product);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        [HttpPut]
+        [HttpPut("Update")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Update([FromForm] ProductUpdateRequest request)
         {
             try
             {
                 var status = await _manageProductService.Update(request);
-                if (status > 0)
+                if (status.IsSuccessed)
                 {
-                    return Ok(request);
+                    return Ok(status);
                 }
-                return BadRequest();
+                return BadRequest(status);
 
             }
             catch (Exception ex)
             {
-                var e = new eShopException(ex.Message, ex);
                 return BadRequest(ex.Message);
             }
         }
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int productId)
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete([FromQuery]DeleteProductRequest request)
         {
             try
             {
-                var status = await _manageProductService.Delete(productId);
-                if (status > 0)
+                var status = await _manageProductService.Delete(request);
+                if (status.IsSuccessed)
                 {
-                    return Ok("Delete successfully");
+                    return Ok(status);
                 }
-                return BadRequest();
+                return BadRequest(status);
 
             }
             catch (Exception ex)
             {
-                var e = new eShopException(ex.Message, ex);
+                return BadRequest(ex.Message);
+            }
+        }
+        [HttpGet("GetById")]
+        public async Task<IActionResult> GetProductById(int ProductId)
+        {
+            try
+            {
+                var status = await _manageProductService.GetProductById(ProductId);
+                if (status.IsSuccessed)
+                {
+                    return Ok(status);
+                }
+                return BadRequest(status);
+
+            }
+            catch (Exception ex)
+            {
                 return BadRequest(ex.Message);
             }
         }
 
 
+        [HttpPost("add")]
+        public async Task<IActionResult> AddToCart(int productId, int quantity)
+        {
+            
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            var session = _httpContextAccessor.HttpContext.Session;
+            var cart = session.GetObjectFromJson<eShopSolution.BackendApi.Models.Cart> ("Cart") ?? new eShopSolution.BackendApi.Models.Cart();
 
+            var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
+            if (cartItem != null)
+            {
+                cartItem.Quantity += quantity;
+            }
+            else
+            {
+                cart.Items.Add(new ShoppingCartItem { ProductId = productId, Quantity = quantity });
+            }
+            session.SetObjectAsJson("Cart",cart);
+            return Ok();
+        }
 
+        [HttpGet("ViewAll")]
+        public IActionResult GetCart()
+        {
+            var session = _httpContextAccessor.HttpContext.Session;
+            var cart = session.GetObjectFromJson<eShopSolution.BackendApi.Models.Cart>("Cart");
+            if (cart != null) return Ok(cart);
+            else return BadRequest();
+        }
+        [HttpPost("clear")]
+        public IActionResult ClearCart()
+        {
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                throw new InvalidOperationException("HttpContext is not available.");
+            }
+
+            var session = httpContext.Session;
+            session.Remove("Cart");
+
+            return Ok(new { Message = "Cart has been cleared" });
+        }
     }
 }

@@ -16,6 +16,8 @@ namespace eShopSolution.Data.Configurations
             builder.ToTable("AppUsersRoles");
             builder.HasOne(x => x.User).WithMany(x => x.AppUserRoles);
             builder.HasOne(x => x.Role).WithMany(x => x.AppUserRoles);
+
+
         }
     }
 }

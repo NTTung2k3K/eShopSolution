@@ -12,6 +12,7 @@ namespace eShopSolution.Application.System.User
 {
     public interface IUserService
     {
+
         public Task<ApiResult<string>> Login(LoginUserRequest request);
         public Task<ApiResult<IdentityResult>> Register(RegisterUserRequest request);
         public Task<ApiResult<PageResult<UserViewModel>>> GetListUser(ViewListUserPagingRequest request);

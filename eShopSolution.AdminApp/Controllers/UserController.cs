@@ -17,12 +17,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using eShopSolution.Data.Entities;
 using eShopSolution.AdminApp.Services.Role;
 using eShopSolution.ViewModel.System.Role;
+using eShopSolution.AdminApp.Models;
+using PayPal.Api;
 
 namespace eShopSolution.AdminApp.Controllers
 {
 
-    [Authorize(Roles = "Admin")]
-    [Authorize(Roles = "Manager")]
+
     public class UserController : BaseController
     {
         private readonly IUserApiService _userApiService;
@@ -221,6 +222,8 @@ namespace eShopSolution.AdminApp.Controllers
         {
             return View();
         }
+
+
 
     }
 

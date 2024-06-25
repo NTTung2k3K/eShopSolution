@@ -22,9 +22,9 @@ namespace eShopSolution.AdminApp.Services
         {
             var json = JsonConvert.SerializeObject(obj);
             var httpContent = new StringContent(json,Encoding.UTF8,"application/json");
-            var session = _httpContextAccessor.HttpContext.Session.GetString(eShopSolution.Utilities.Constants.Systemconstant.AppSettings.Token);
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_configuration[eShopSolution.Utilities.Constants.Systemconstant.AppSettings.BaseAddress]);
+            var session = _httpContextAccessor.HttpContext.Session.GetString(eShopSolution.Utilities.Constants.Systemconstant.AppSettings.Token);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session);
             var response = await client.PostAsync(url, httpContent);
             var body = await response.Content.ReadAsStringAsync();

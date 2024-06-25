@@ -5,7 +5,9 @@ using eShopSolution.Data.Entities;
 using eShopSolution.Utilities;
 using eShopSolution.ViewModel.Catalog.Common;
 using eShopSolution.ViewModel.Catalog.Product;
+using eShopSolution.ViewModel.Common;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +26,6 @@ namespace eShopSolution.Application.Catalog.Products
     {
         private readonly EShopDBContext _context;
         private readonly IStorageService _storageService;
-        private readonly int PAGE_SIZE = 10;
         private const string USER_CONTENT_FOLDER_NAME = "user-content";
         public ManageProductService(EShopDBContext context, IStorageService storageService)
         {
@@ -32,7 +33,7 @@ namespace eShopSolution.Application.Catalog.Products
             _storageService = storageService;
         }
 
-        public async Task<int> Create(ProductCreateRequest request)
+        public async Task<ApiResult<bool>> Create(ProductCreateRequest request)
         {
             var product = new Product()
             {
@@ -53,8 +54,6 @@ namespace eShopSolution.Application.Catalog.Products
                         SeoDescription = request.SeoDescription,
                         SeoTitle = request.SeoTitle,
                         LanguageId = request.LanguageId,
-                        
-
                     }
                 }
             };
@@ -75,16 +74,18 @@ namespace eShopSolution.Application.Catalog.Products
                 };
             }
             _context.Products.Add(product);
-            return await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
 
 
 
-        public async Task<PageResult<ProductViewModel>> GetAllPaging(ProductPagingManageRequest request)
+        public async Task<ApiResult<PageResult<ProductViewModel>>> GetAllPaging(ProductPagingManageRequest request)
         {
             var allProduct = from p in _context.Products
-                             join pt in _context.ProductTranslations on p.Id equals pt.ProductId
+                             join pt in _context.ProductTranslations on p.Id equals pt.ProductId into JoinedItem
+                             from pt in JoinedItem.DefaultIfEmpty() 
                              select new
                              {
                                  Product = p,
@@ -93,14 +94,12 @@ namespace eShopSolution.Application.Catalog.Products
             #region Filter
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                allProduct = from p in _context.Products
-                             join pt in _context.ProductTranslations on p.Id equals pt.ProductId
-                             where pt.Name.Contains(request.Keyword)
-                             select new
-                             {
-                                 Product = p,
-                                 ProductTranslation = pt
-                             };
+                allProduct = allProduct.Where(x => x.ProductTranslation.Name.Contains(request.Keyword)
+                                                || x.ProductTranslation.Details.Contains(request.Keyword)
+                                                || x.ProductTranslation.Description.Contains(request.Keyword)
+                                                || x.ProductTranslation.SeoAlias.Contains(request.Keyword)
+                                                || x.ProductTranslation.SeoDescription.Contains(request.Keyword)
+                                                || x.ProductTranslation.SeoTitle.Contains(request.Keyword));
             }
             #endregion
 
@@ -110,7 +109,7 @@ namespace eShopSolution.Application.Catalog.Products
             #region Paging
             int pageIndex = request.pageIndex?? 1;
            
-            var productPaged = allProduct.ToPagedList(pageIndex, PAGE_SIZE);
+            var productPaged = allProduct.ToPagedList(pageIndex, eShopSolution.ViewModel.Common.PageInfo.PAGE_SIZE);
             #endregion
             var productResult = productPaged.Select(x => new ProductViewModel()
             {
@@ -132,16 +131,18 @@ namespace eShopSolution.Application.Catalog.Products
             var pageResult = new PageResult<ProductViewModel>()
             {
                 Items = productResult,
-                TotalRecords = productResult.Count
+                TotalRecords = productResult.Count,
+                PageIndex = pageIndex,
+                PageSize = eShopSolution.ViewModel.Common.PageInfo.PAGE_SIZE
             };
-            return pageResult;
+            return new ApiSuccessResult<PageResult<ProductViewModel>>(pageResult,"Success");
         }
 
-        public async Task<int> Update(ProductUpdateRequest request)
+        public async Task<ApiResult<bool>> Update(ProductUpdateRequest request)
         {
             var product = await _context.Products.FindAsync(request.Id);
             var productTranslate = _context.ProductTranslations.FirstOrDefault(x => x.ProductId == request.Id);
-            if (product == null || productTranslate == null) throw new eShopException("Not exist ProductId " + request.Id);
+            if (product == null || productTranslate == null) return new ApiErrorResult<bool>("Not exist ProductId " + request.Id);
             productTranslate.Name = request.Name;
             productTranslate.Description = request.Description;
             productTranslate.Details = request.Details;
@@ -165,24 +166,27 @@ namespace eShopSolution.Application.Catalog.Products
             }
 
 
-            return await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<int> UpdatePrice(int productId, decimal newPrice, decimal newOriginalPrice)
+        public async Task<ApiResult<bool>> UpdatePrice(ProductUpdatePriceRequest request)
         {
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null) throw new eShopException("Not exist ProductId " + productId);
-            product.Price = newPrice;
-            product.OriginalPrice = newOriginalPrice;
-            return await _context.SaveChangesAsync();
+            var product = await _context.Products.FindAsync(request.productId);
+            if (product == null) return new ApiErrorResult<bool>("Not exist ProductId " + request.productId);
+
+            product.Price = request.newPrice;
+            product.OriginalPrice = request.newOriginalPrice;
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<int> UpdateViewCount(int productId, int newViewCount)
+        public async Task<ApiResult<bool>> UpdateViewCount(UpdateViewCountProductRequest request)
         {
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null) throw new eShopException("Not exist ProductId " + productId);
-            product.ViewCount = newViewCount;
-            return await _context.SaveChangesAsync();
+            var product = await _context.Products.FindAsync(request.productId);
+            if (product == null) return new ApiErrorResult<bool>("Not exist ProductId " + request.productId);
+            product.ViewCount = request.newViewCount;
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
         private async Task<string> SaveFile(IFormFile file)
         {
@@ -192,43 +196,46 @@ namespace eShopSolution.Application.Catalog.Products
             return "/" + USER_CONTENT_FOLDER_NAME + "/" + fileName;
         }
 
-        public async Task<int> Delete(int productId)
+        public async Task<ApiResult<bool>> Delete(DeleteProductRequest request)
         {
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null) throw new eShopException("Not found productId " + productId);
-            var thumbnalImage = _context.ProductImages.Where(x => x.ProductId == productId);
+            var product = await _context.Products.FindAsync(request.ProductId);
+            if (product == null) return new ApiErrorResult<bool>("Not exist ProductId " + request.ProductId);
+            var thumbnalImage = _context.ProductImages.Where(x => x.ProductId == request.ProductId);
             foreach (var item in thumbnalImage)
             {
                 await _storageService.DeleteFileAsync(item.ImagePath);
             }
             _context.Products.Remove(product);
-            return await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<int> UpdateImage(int imageId, string caption, bool IsDefault)
+        public async Task<ApiResult<bool>> UpdateImage(UpdateImageProductRequest request)
         {
-            var thumbnalImage = await _context.ProductImages.FindAsync(imageId);
-            if (thumbnalImage == null) throw new eShopException("Not exist ImageId " + imageId);
-            thumbnalImage.Caption = caption;
-            thumbnalImage.IsDefault = IsDefault;
+            var thumbnalImage = await _context.ProductImages.FindAsync(request.imageId);
+            if (thumbnalImage == null) return new ApiErrorResult<bool>("Not exist ImageId " + request.imageId);
+            thumbnalImage.Caption = request.caption;
+            thumbnalImage.IsDefault = request.IsDefault;
             _context.ProductImages.Update(thumbnalImage);
-            return await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<int> RemoveImage(int imageId)
+        public async Task<ApiResult<bool>> RemoveImage(RemoveImageProductRequest request)
         {
-            var image = await _context.ProductImages.FindAsync(imageId);
-            if (image == null) throw new eShopException("Not found ImageId " + imageId);
+            var image = await _context.ProductImages.FindAsync(request.imageId);
+            if (image == null) return new ApiErrorResult<bool>("Not exist ImageId " + request.imageId);
             await _storageService.DeleteFileAsync(image.ImagePath);
             _context.ProductImages.Remove(image);
-            return await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<int> AddImages(int productId, List<IFormFile> listImage)
+        public async Task<ApiResult<bool>> AddImages(AddImagesProductRequest request)
         {
-            var product = await _context.Products.FindAsync(productId);
-            if (product == null) throw new eShopException("Not found productId " + productId);
-            foreach (var item in listImage)
+            var product = await _context.Products.FindAsync(request.productId);
+            if (product == null) throw new eShopException("Not found productId " + request.productId);
+            foreach (var item in request.listImage)
             {
                 product.ProductImages.Add(new ProductImage()
                 {
@@ -250,15 +257,16 @@ namespace eShopSolution.Application.Catalog.Products
                     SortOrder = 1
                 });
             }
-            return await _context.SaveChangesAsync();
+             await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>("Success");
         }
 
-        public async Task<ProductViewModel> GetProductById(int productId)
+        public async Task<ApiResult<ProductViewModel>> GetProductById(int productId)
         {
             var product = await _context.Products.FindAsync(productId);
             if (product == null) throw new eShopException("Not found productId " + productId);
             var productTranslate = _context.ProductTranslations.FirstOrDefault(x => x.ProductId == productId);
-            if (productTranslate == null) throw new eShopException("Not found productId in ProductTranslate " + productId);
+            if (productTranslate == null) return new ApiErrorResult<ProductViewModel>("Not found productId in ProductTranslate " + productId);
 
             var productViewModel = new ProductViewModel()
             {
@@ -277,7 +285,7 @@ namespace eShopSolution.Application.Catalog.Products
                 SeoTitle = productTranslate.SeoTitle,
                 LanguageId = productTranslate.LanguageId
             };
-            return productViewModel;
+            return new ApiSuccessResult<ProductViewModel>("Success");
         }
     }
 }

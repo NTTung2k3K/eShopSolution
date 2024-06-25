@@ -1,7 +1,9 @@
 ﻿
 using eShopSolution.Data.EF;
+using eShopSolution.Data.Entities;
 using eShopSolution.ViewModel.Catalog.Common;
 using eShopSolution.ViewModel.Catalog.Product;
+using eShopSolution.ViewModel.Common;
 using Microsoft.EntityFrameworkCore;
 using PagedList;
 using System;
@@ -9,19 +11,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eShopSolution.Application.Catalog.Products;
+using Microsoft.AspNetCore.Http;
 
 namespace eShopSolution.Application.Catalog.Products
 {
     public class PublicProductService : IPublicProductService
     {
         private readonly EShopDBContext _context;
-        private readonly int PAGE_SIZE = 10;
 
 
         public PublicProductService(EShopDBContext context) {
             _context = context;
         }
-        public async Task<PageResult<ProductViewModel>> GetAllByCategoryId(ProductPagingPublicRequest request)
+
+      
+        public async Task<ApiResult<PageResult<ProductViewModel>>> GetAllByCategoryId(ProductPagingPublicRequest request)
         {
             var allProduct = from c in _context.Categories
                              join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
@@ -30,14 +35,21 @@ namespace eShopSolution.Application.Catalog.Products
                              select new
                              {
                                  Product = p,
-                                 ProductTranslation = pt
+                                 ProductTranslation = pt,
+                                 ProductInCategory = pic
                              };
+            if (request.CategoryId != null)
+            {
+                allProduct = allProduct.Where(x => x.ProductInCategory.CategoryId == request.CategoryId);
+            }
 
+
+            allProduct = allProduct.OrderByDescending(x => x.ProductTranslation.Name);
 
             #region Paging
             int pageIndex = request.pageIndex ?? 1;
 
-            var productPaged = allProduct.ToPagedList(pageIndex, PAGE_SIZE);
+            var productPaged = allProduct.ToPagedList(pageIndex, eShopSolution.ViewModel.Common.PageInfo.PAGE_SIZE);
             #endregion
             var productResult = productPaged.Select(x => new ProductViewModel()
             {
@@ -60,10 +72,14 @@ namespace eShopSolution.Application.Catalog.Products
             var pageResult = new PageResult<ProductViewModel>()
             {
                 Items = productResult,
-                TotalRecords = productResult.Count
+                TotalRecords = productResult.Count,
+                PageIndex = pageIndex,
+                PageSize = eShopSolution.ViewModel.Common.PageInfo.PAGE_SIZE
             };
 
-            return pageResult;
+            return new ApiSuccessResult<PageResult<ProductViewModel>>(pageResult,"Success");
         }
+
+      
     }
 }
