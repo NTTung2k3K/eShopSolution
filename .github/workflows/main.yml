@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "6.0.x"
+          dotnet-version: '6.0.x'
 
       - name: Restore
         run: dotnet restore ./eShopSolution.sln
@@ -32,7 +32,7 @@ jobs:
       - name: Publish
         run: dotnet publish ./eShopSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
 
-       - name: Compress publish directory
+      - name: Compress publish directory
         run: |
           cd ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
           zip -r ../${{ env.ARTIFACT_NAME }} *
@@ -42,6 +42,7 @@ jobs:
         with:
           name: dotnet-app
           path: ${{ env.ARTIFACT_NAME }}
+
   deploy:
     runs-on: ubuntu-latest
     needs: build
@@ -49,7 +50,7 @@ jobs:
       name: "Production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-     steps:
+    steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v2
         with:
