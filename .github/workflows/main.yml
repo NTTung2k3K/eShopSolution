@@ -1,26 +1,57 @@
-name: Publish
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - phoenix123
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
+  workflow_dispatch:
+
 jobs:
-  publish: 
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with: 
-          dotnet-version: '6.0.x'
-      - name: Restore
-        run: dotnet restore ./eShopSolution.sln
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "7.x"
+          include-prerelease: true
 
-      - name: Build
-        run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
+      - name: Build with dotnet
+        run: dotnet build Phoenix.Web --configuration Release
 
-      - name: Publish
-        run: dotnet publish ./eShopSolution.sln --configuration Release --no-restore --output ./publish
+      - name: dotnet publish
+        run: dotnet publish Phoenix.Web -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: "Production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "phoenix123"
+          slot-name: "Production"
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_93245C1B3B574C66955875BD6B1FEE3B }}
+          package: .
