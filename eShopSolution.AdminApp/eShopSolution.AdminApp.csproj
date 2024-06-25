@@ -28,14 +28,15 @@
 		<ProjectReference Include="..\eShopSolution.BackendApi\eShopSolution.BackendApi.csproj" />
 		<ProjectReference Include="..\eShopSolution.Utilities\eShopSolution.Utilities.csproj" />
 	</ItemGroup>
+
 	<ItemGroup>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>eShopSolution.AdminApp/appsettings.json</TargetPath>
+			<TargetPath>AdminApp/appsettings.json</TargetPath>
 		</None>
 		<None Update="appsettings.Development.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>eShopSolution.AdminApp/appsettings.Development.json</TargetPath>
+			<TargetPath>AdminApp/appsettings.Development.json</TargetPath>
 		</None>
 	</ItemGroup>
 

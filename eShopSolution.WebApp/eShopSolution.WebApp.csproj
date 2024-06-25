@@ -23,11 +23,11 @@
 	<ItemGroup>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>eShopSolution.WebApp/appsettings.json</TargetPath>
+			<TargetPath>WebApp/appsettings.json</TargetPath>
 		</None>
 		<None Update="appsettings.Development.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>eShopSolution.WebApp/appsettings.Development.json</TargetPath>
+			<TargetPath>WebApp/appsettings.Development.json</TargetPath>
 		</None>
 	</ItemGroup>
 

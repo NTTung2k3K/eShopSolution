@@ -23,4 +23,4 @@ jobs:
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./eShopSolution.sln --configuration Release --no-restore
+        run: dotnet publish ./eShopSolution.sln --configuration Release --no-restore --output ./publish
