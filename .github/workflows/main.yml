@@ -9,6 +9,7 @@ on:
 env:
   AZURE_WEBAPP_NAME: eshopserver
   AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+  ARTIFACT_NAME: "dotnet-app.zip"
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "7.x"
+          dotnet-version: "6.0.x"
 
       - name: Restore
         run: dotnet restore ./eShopSolution.sln
