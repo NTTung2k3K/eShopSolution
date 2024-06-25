@@ -1,39 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="Firebase.Auth" Version="1.0.0" />
-    <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.39" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Owin.Security.Facebook" Version="4.2.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
-    <PackageReference Include="PayPal" Version="1.9.1" />
-    <PackageReference Include="Twilio" Version="7.0.5" />
-    <PackageReference Include="Twilio.AspNet.Core" Version="8.0.2" />
-    <PackageReference Include="Twilio.AspNet.Mvc" Version="8.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="Firebase.Auth" Version="1.0.0" />
+		<PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.1.39" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Owin.Security.Facebook" Version="4.2.2" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+		<PackageReference Include="PayPal" Version="1.9.1" />
+		<PackageReference Include="Twilio" Version="7.0.5" />
+		<PackageReference Include="Twilio.AspNet.Core" Version="8.0.2" />
+		<PackageReference Include="Twilio.AspNet.Mvc" Version="8.0.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\eShopSolution.Application\eShopSolution.Application.csproj" />
-    <ProjectReference Include="..\eShopSolution.BackendApi\eShopSolution.BackendApi.csproj" />
-    <ProjectReference Include="..\eShopSolution.Utilities\eShopSolution.Utilities.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\eShopSolution.Application\eShopSolution.Application.csproj" />
+		<ProjectReference Include="..\eShopSolution.BackendApi\eShopSolution.BackendApi.csproj" />
+		<ProjectReference Include="..\eShopSolution.Utilities\eShopSolution.Utilities.csproj" />
+	</ItemGroup>
 	<ItemGroup>
 		<None Update="appsettings.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>eShopSolution.AdminApp/appsettings.json</TargetPath>
 		</None>
 		<None Update="appsettings.Development.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<TargetPath>eShopSolution.AdminApp/appsettings.Development.json</TargetPath>
 		</None>
 	</ItemGroup>
 
