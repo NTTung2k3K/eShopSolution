@@ -1,0 +1,73 @@
+﻿@model eShopSolution.ViewModel.System.User.UserViewModel
+
+@{
+    ViewData["Title"] = "Detail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h1>Detail</h1>
+
+<div>
+    <label style="color:red">@ViewBag.Error</label>
+
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Username)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Username)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Dob)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Dob)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Roles)
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var role in Model.Roles)
+            {
+                <span class="m-1">@role </span>
+            }
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <form asp-action="Edit" asp-controller="User" method="get">
+        <input name="UserId" type="hidden" value="@Model.Id" />
+        <button class="btn btn-warning" style="text-decoration: none">
+            Edit
+        </button>
+
+    </form>
+    <br />
+    <a asp-action="GetAllUser" asp-controller="User">Back to List</a>
+</div>
