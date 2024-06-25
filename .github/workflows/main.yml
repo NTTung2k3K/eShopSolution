@@ -5,6 +5,12 @@ on:
   push:
     branches:
       - master
+
+env:
+  AZURE_WEBAPP_NAME: eshopserver
+  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+
+
 jobs:
   publish: 
     runs-on: ubuntu-latest
@@ -23,4 +29,10 @@ jobs:
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish ./eShopSolution.sln --configuration Release --no-restore --output ./publish
+        run: dotnet publish ./eShopSolution.sln --configuration Release --no-restore --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
+      - name: Deployment
+        uses: azure/webapps-deploy@v2
+        with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            publish-profile: ''
+            package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
