@@ -1,4 +1,7 @@
-name: Build and deploy ASP.Net Core app to Azure Web App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - EShopServer
 
 on:
   push:
@@ -6,64 +9,57 @@ on:
       - master
   workflow_dispatch:
 
-env:
-  AZURE_WEBAPP_NAME: eshopserver
-  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
-  ARTIFACT_NAME: "dotnet-app.zip"
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Setup .NET Core
+      - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: "6.0.x"
+          include-prerelease: true
 
-      - name: Restore
-        run: dotnet restore ./eShopSolution.sln
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
 
-      - name: Build
-        run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish ./eShopSolution.sln --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-
-      - name: Compress publish directory
-        run: |
-          cd ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          zip -r ../${{ env.ARTIFACT_NAME }} *
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: dotnet-app
-          path: ${{ env.ARTIFACT_NAME }}
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
-      name: "Production"
+      name: "production"
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    permissions:
+      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
-          name: dotnet-app
+          name: .net-app
 
-      - name: Unzip artifact
-        run: |
-          unzip dotnet-app.zip -d ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.__clientidsecretname__ }}
+          tenant-id: ${{ secrets.__tenantidsecretname__ }}
+          subscription-id: ${{ secrets.__subscriptionidsecretname__ }}
 
       - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: "Production"
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          app-name: "EShopServer"
+          slot-name: "production"
+          package: .
