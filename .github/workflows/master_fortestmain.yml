@@ -41,7 +41,7 @@ jobs:
       - name: Compress publish directories
         run: |
           cd ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          zip -r ../${{ env.ARTIFACT_NAME }} *
+          zip -r ../${{ env.ARTIFACT_NAME }} .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
