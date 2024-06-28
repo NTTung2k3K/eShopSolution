@@ -84,12 +84,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
-app.UsePathBase("/admin");
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "admin/{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 });
 
 app.Run();
