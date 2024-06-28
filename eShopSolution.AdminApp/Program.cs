@@ -91,8 +91,9 @@ app.UseSession();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        name: "admin",
+        pattern: "AdminApp/{controller=Home}/{action=Index}/{id?}");
 });
+
 
 app.Run();
