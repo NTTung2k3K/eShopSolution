@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/eastus/connectors/ConnectionStringseShopSolutionDb_04B195EBB0",
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/eshopserverdb/databases/eshoptest",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:eShopSolutionDb",
+      "dynamicId": null
+    }
+  }
+}
