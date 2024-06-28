@@ -27,7 +27,7 @@
 <p>
     <a asp-action="Create" asp-controller="Role" class="btn btn-primary">Create</a>
 </p>
-@if (Model.Items.Count() > 0)
+@if (Model != null && Model.Items.Count() > 0)
 {
 
     <table class="table">
@@ -64,6 +64,9 @@
             }
         </tbody>
     </table>
+    <div class="d-flex justify-content-center align-items-center">
+        @await Component.InvokeAsync("Pager", Model)
+    </div>
 
 }
 else
@@ -71,9 +74,7 @@ else
     <h3 class="d-flex justify-content-center align-items-center" style="color:red; font-weight:bold">Not Found</h3>
 }
 
-<div class="d-flex justify-content-center align-items-center">
-    @await Component.InvokeAsync("Pager", Model)
-</div>
+
 
 <!-- #region notification -->
 @if (ViewBag.SuccessMsg != null)
