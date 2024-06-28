@@ -82,11 +82,6 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-app.UsePathBase("/api");
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
 
 
 app.Run();
