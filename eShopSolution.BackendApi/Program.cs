@@ -26,12 +26,15 @@ builder.Services.AddControllers().AddFluentValidation(fv => fv.RegisterValidator
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IManageProductService,ManageProductService>();
+
+// Register application services
+builder.Services.AddTransient<IManageProductService, ManageProductService>();
 builder.Services.AddTransient<IPublicProductService, PublicProductService>();
 builder.Services.AddTransient<IStorageService, FileStorageService>();
 builder.Services.AddTransient<IUserService, UserService>();
-builder.Services.AddTransient<IValidator<LoginUserRequest>,LoginValidationRequest>();
+builder.Services.AddTransient<IValidator<LoginUserRequest>, LoginValidationRequest>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -40,6 +43,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -49,7 +53,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -58,30 +62,42 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-builder.Services.AddIdentity<AppUser,AppRole>()
-            .AddEntityFrameworkStores<EShopDBContext>();
-builder.Services.AddHttpContextAccessor();
-var app = builder.Build();
-app.UseSession();
-app.UseCors(x => x
-    .AllowAnyHeader()   // Allows any header in the request
-    .AllowAnyMethod()   // Allows any HTTP method (GET, POST, PUT, DELETE, etc.)
-    .WithOrigins("http://localhost:3000"));  // Allows requests from the specified origin
 
-app.UseAuthentication();
-app.UseAuthorization();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+builder.Services.AddIdentity<AppUser, AppRole>()
+    .AddEntityFrameworkStores<EShopDBContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddHttpContextAccessor();
+
+var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseSession();
+
+app.UseCors(x => x
+    .AllowAnyHeader()   // Allows any header in the request
+    .AllowAnyMethod()   // Allows any HTTP method (GET, POST, PUT, DELETE, etc.)
+    .AllowAnyOrigin()); // Allows requests from any origin
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
-
-
 
 app.Run();
