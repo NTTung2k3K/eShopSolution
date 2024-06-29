@@ -8,8 +8,10 @@ on:
 
 env:
   AZURE_WEBAPP_NAME: ForTestMain
-  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
-  ARTIFACT_NAME: "dotnet-app"
+  ARTIFACTS_PATH: ./publish
+  ADMIN_APP_PACKAGE: ${{ env.ARTIFACTS_PATH }}/AdminApp
+  WEB_APP_PACKAGE: ${{ env.ARTIFACTS_PATH }}/WebApp
+  API_PACKAGE: ${{ env.ARTIFACTS_PATH }}/BackendApi
 
 jobs:
   build:
@@ -30,26 +32,26 @@ jobs:
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish Admin App
-        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/AdminApp'
+        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output ${{ env.ADMIN_APP_PACKAGE }}
 
       - name: Publish Customer App
-        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/WebApp'
+        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output ${{ env.WEB_APP_PACKAGE }}
 
       - name: Publish API
-        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/BackendApi'
+        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output ${{ env.API_PACKAGE }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
 
     steps:
-      - name: Deploy to Azure Web App
+      - name: Deploy Admin App to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/AdminApp"
+          package: ${{ env.ADMIN_APP_PACKAGE }}
 
       - name: Deploy Customer App to Azure Web App
         uses: azure/webapps-deploy@v2
@@ -57,7 +59,7 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/WebApp"
+          package: ${{ env.WEB_APP_PACKAGE }}
 
       - name: Deploy API to Azure Web App
         uses: azure/webapps-deploy@v2
@@ -65,4 +67,4 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/BackendApi"
+          package: ${{ env.API_PACKAGE }}
