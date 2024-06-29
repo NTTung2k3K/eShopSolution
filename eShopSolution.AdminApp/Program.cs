@@ -23,7 +23,6 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddTransient<IUserApiService, UserApiService>();
 builder.Services.AddTransient<IRoleApiService, RoleApiService>();
 
-
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -39,11 +38,11 @@ builder.Services.AddAuthentication().AddGoogle(options =>
     options.ClientSecret = builder.Configuration.GetSection("GoogleKey:ClientSecret").Value;
 }).AddFacebook(options =>
 {
-  
     options.ClientId = "1512742102972911";
     options.ClientSecret = "3aca4a3a2b93632fc187c221bf000b7b";
     options.Scope.Remove("email");
 });
+
 builder.Services.AddDbContext<EShopDBContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("eShopSolutionDb"));
@@ -52,14 +51,7 @@ builder.Services.AddIdentity<AppUser, AppRole>()
     .AddEntityFrameworkStores<EShopDBContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddAutoMapper(typeof(Program)); ;
-
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
-    options.Cookie.HttpOnly = true; // Make the session cookie HTTP only
-    options.Cookie.IsEssential = true; // Make the session cookie essential
-});
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
@@ -70,12 +62,11 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 else
 {
-    app.UseHsts();
+    app.UseDeveloperExceptionPage();
 }
 app.UseSession();
 
@@ -86,7 +77,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.UseEndpoints(endpoints =>
 {
@@ -94,6 +84,5 @@ app.UseEndpoints(endpoints =>
         name: "admin",
         pattern: "AdminApp/{controller=Home}/{action=Index}/{id?}");
 });
-
 
 app.Run();
