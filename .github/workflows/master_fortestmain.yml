@@ -30,13 +30,13 @@ jobs:
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish Admin App
-        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/admin'
+        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/AdminApp'
 
       - name: Publish Customer App
-        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/customer'
+        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/WebApp'
 
       - name: Publish API
-        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/api'
+        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/BackendApi'
 
       - name: Compress publish directories
         run: |
