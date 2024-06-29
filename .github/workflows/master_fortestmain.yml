@@ -11,17 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      - name: Restore
+      - name: Restore dependencies
         run: dotnet restore ./eShopSolution.sln
 
-      - name: Build
+      - name: Build solution
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish Admin App
@@ -32,6 +33,12 @@ jobs:
 
       - name: Publish API
         run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output './publish/BackendApi'
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v2
+        with:
+          name: dotnet-app
+          path: "./publish"
 
   deploy:
     runs-on: ubuntu-latest
@@ -49,4 +56,4 @@ jobs:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: "./publish"
+          package: ${{ github.workspace }}/publish
