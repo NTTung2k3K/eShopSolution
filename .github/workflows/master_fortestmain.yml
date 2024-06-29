@@ -30,13 +30,13 @@ jobs:
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish Admin App
-        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/AdminApp
+        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.AdminApp
 
       - name: Publish Customer App
-        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/WebApp
+        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.WebApp
 
       - name: Publish API
-        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/BackendApi
+        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.BackendApi
 
       - name: Deploy Admin App to Azure Web App
         uses: azure/webapps-deploy@v2
