@@ -7,57 +7,46 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
-    env:
-      AZURE_WEBAPP_NAME: ForTestMain
-      ARTIFACTS_PATH: ./publish
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "6.0.x"
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore ./eShopSolution.sln
 
-      - name: Build projects
+      - name: Build
         run: dotnet build ./eShopSolution.sln --configuration Release --no-restore
 
       - name: Publish Admin App
-        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.AdminApp
+        run: dotnet publish ./eShopSolution.AdminApp/eShopSolution.AdminApp.csproj --configuration Release --output './publish/AdminApp'
 
       - name: Publish Customer App
-        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.WebApp
+        run: dotnet publish ./eShopSolution.WebApp/eShopSolution.WebApp.csproj --configuration Release --output './publish/WebApp'
 
       - name: Publish API
-        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output ${{ env.ARTIFACTS_PATH }}/eShopSolution.BackendApi
+        run: dotnet publish ./eShopSolution.BackendApi/eShopSolution.BackendApi.csproj --configuration Release --output './publish/BackendApi'
 
-      - name: Deploy Admin App to Azure Web App
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: dotnet-app
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           slot-name: "Production"
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: ${{ env.ARTIFACTS_PATH }}/eShopSolution.AdminApp
-
-      - name: Deploy Customer App to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: "Production"
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: ${{ env.ARTIFACTS_PATH }}/eShopSolution.WebApp
-
-      - name: Deploy API to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: "Production"
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: ${{ env.ARTIFACTS_PATH }}/eShopSolution.BackendApi
+          package: "./publish"
